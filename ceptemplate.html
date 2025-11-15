@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EvoFit - Template</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Default Dark Theme */
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --accent-color: #818cf8;
+      --accent-hover: #6366f1;
+      --nav-bg: rgba(15, 23, 42, 0.95);
+      --border-color: rgba(129, 140, 248, 0.3);
+      --shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+    }
+
+    [data-theme="light"] {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8f9fa;
+      --text-primary: #1a1a1a;
+      --text-secondary: #666666;
+      --accent-color: #6366f1;
+      --accent-hover: #4f46e5;
+      --nav-bg: rgba(255, 255, 255, 0.95);
+      --border-color: #e5e7eb;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      transition: background-color 0.3s ease, color 0.3s ease;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Navigation Bar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: var(--nav-bg);
+      backdrop-filter: blur(10px);
+      padding: 1rem 2rem;
+      box-shadow: var(--shadow);
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--accent-color);
+      text-decoration: none;
+      transition: transform 0.3s ease;
+    }
+
+    .logo:hover {
+      transform: scale(1.05);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent-color);
+      background: var(--bg-secondary);
+    }
+
+    .theme-toggle {
+      background: var(--bg-secondary);
+      border: 2px solid var(--border-color);
+      border-radius: 50px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.1);
+      border-color: var(--accent-color);
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+
+    /* Main Content Area */
+    main {
+      flex: 1;
+      margin-top: 70px;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--bg-secondary);
+      padding: 3rem 2rem;
+      text-align: center;
+      border-top: 2px solid var(--border-color);
+      margin-top: auto;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .motivational-text {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--accent-color);
+      margin-bottom: 1rem;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent-color);
+    }
+
+    .copyright {
+      margin-top: 1.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .nav-links {
+        position: fixed;
+        top: 70px;
+        left: -100%;
+        flex-direction: column;
+        background: var(--nav-bg);
+        width: 100%;
+        padding: 2rem;
+        box-shadow: var(--shadow);
+        transition: left 0.3s ease;
+        gap: 1rem;
+      }
+
+      .nav-links.active {
+        left: 0;
+      }
+
+      .mobile-menu-btn {
+        display: block;
+      }
+
+      .navbar {
+        padding: 1rem;
+      }
+
+      .motivational-text {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#" class="logo">EvoFit</a>
+      <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#login">Login</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><button class="theme-toggle" id="themeToggle">☀️</button></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Content Area - Add your content here -->
+  <main>
+    <div class="container">
+      <!-- Your content goes here -->
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p class="motivational-text">Build something amazing.</p>
+      <div class="footer-links">
+        <a href="#about">About Us</a>
+        <a href="#contact">Contact</a>
+        <a href="#privacy">Privacy Policy</a>
+        <a href="#terms">Terms of Service</a>
+      </div>
+      <p class="copyright">© 2025 EvoFit. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+
+    // Default dark theme
+    html.removeAttribute('data-theme');
+    themeToggle.textContent = '☀️';
+
+    themeToggle.addEventListener('click', () => {
+      if (html.getAttribute('data-theme') === 'light') {
+        html.removeAttribute('data-theme');
+        themeToggle.textContent = '☀️';
+      } else {
+        html.setAttribute('data-theme', 'light');
+        themeToggle.textContent = '🌙';
+      }
+    });
+
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const navLinks = document.getElementById('navLinks');
+
+    mobileMenuBtn.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+      mobileMenuBtn.textContent = navLinks.classList.contains('active') ? '✕' : '☰';
+    });
+
+    // Close mobile menu when clicking nav links
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+          navLinks.classList.remove('active');
+          mobileMenuBtn.textContent = '☰';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

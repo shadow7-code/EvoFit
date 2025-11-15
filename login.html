@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    /* Navigation Bar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 1rem 2rem;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+      z-index: 2000;
+      transition: all 0.3s ease;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #818cf8;
+      text-decoration: none;
+      transition: transform 0.3s ease;
+    }
+
+    .logo:hover {
+      transform: scale(1.05);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: #f1f5f9;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+    }
+
+    .nav-links a:hover {
+      color: #818cf8;
+      background: rgba(30, 41, 59, 0.5);
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #f1f5f9;
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        position: fixed;
+        top: 70px;
+        left: -100%;
+        flex-direction: column;
+        background: rgba(15, 23, 42, 0.95);
+        width: 100%;
+        padding: 2rem;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+        transition: left 0.3s ease;
+        gap: 1rem;
+      }
+
+      .nav-links.active {
+        left: 0;
+      }
+
+      .mobile-menu-btn {
+        display: block;
+      }
+
+      .navbar {
+        padding: 1rem;
+      }
+    }
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
+
+    * {margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif;}
+
+    body {
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh;
+      background: #1A1A2E; 
+      padding: 20px;
+    }
+
+    @property --a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+
+    .box {
+      position: relative; 
+      width: 450px; 
+      height: auto;
+      min-height: 500px;
+      background: repeating-conic-gradient(from var(--a), #8A8AFF 0%, #8A8AFF 5%, transparent 5%, transparent 40%, #8A8AFF 50%);
+      filter: drop-shadow(0 15px 50px #000);
+      animation: rotating 4s linear infinite;
+      border-radius: 20px; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center;
+    }
+
+    @keyframes rotating { 
+      0%{--a:0deg;} 
+      100%{--a:360deg;} 
+    }
+
+    .box::before {
+      content: ""; position: absolute; width: 100%; height: 100%;
+      background: repeating-conic-gradient(from var(--a), #8A8AFF 0%, #8A8AFF 5%, transparent 5%, transparent 40%, #8A8AFF 50%);
+      filter: drop-shadow(0 15px 50px #000);
+      border-radius: 20px; 
+      animation: rotating 4s linear infinite; 
+      animation-delay: -1s;
+    }
+    .box::after {
+      content: ""; position: absolute; inset: 4px;
+      background: #2C2E43; 
+      border-radius: 15px; border: 8px solid #1A1A2E; 
+    }
+
+    .login {
+      position: absolute; 
+      inset: 40px; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center;
+      border-radius: 10px; 
+      flex-direction: column; 
+      background: rgba(0,0,0,0.2);
+      z-index: 1000; 
+      box-shadow: inset 0 10px 20px rgba(0,0,0,0.5);
+      border-bottom: 2px solid rgba(255,255,255,0.5);
+      color: #fff; 
+      overflow: hidden;
+    }
+
+    .loginBx {
+      position: relative; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center;
+      flex-direction: column; 
+      gap: 20px; 
+      width: 80%; 
+      max-width: 300px;
+    }
+
+    .loginBx h2 { 
+      text-transform: uppercase; 
+      letter-spacing: 0.2em; 
+      font-weight: 600; 
+      font-size: 1.3rem;
+      text-align: center;
+    }
+    .loginBx h2 i {
+      color: #8A8AFF; 
+      text-shadow: 0 0 5px #8A8AFF, 0 0 30px #8A8AFF; 
+    }
+
+    .loginBx input {
+      width: 100%; 
+      padding: 10px 20px; 
+      outline: none; 
+      font-size: 1em;
+      color: #fff; 
+      background: rgba(0,0,0,0.1);
+      border: 2px solid #fff; 
+      border-radius: 30px;
+    }
+    .loginBx input::placeholder { color: #999; }
+
+    .loginBx input[type="submit"] {
+      background: #8A8AFF; 
+      border: none; 
+      font-weight: 500; 
+      color: #111;
+      cursor: pointer; 
+      transition: 0.5s;
+    }
+    .loginBx input[type="submit"]:hover {
+      box-shadow: 0 0 10px #8A8AFF, 0 0 60px #8A8AFF; 
+    }
+
+    .rememberBtn {
+      padding: 10px 20px;
+      border-radius: 30px;
+      border: 2px solid #8A8AFF;
+      background: transparent;
+      color: #8A8AFF;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.4s;
+      width: 100%;
+      text-align: center;
+      font-size: 1em;
+    }
+    .rememberBtn.active {
+      background: #8A8AFF;
+      color: #111;
+      box-shadow: 0 0 10px #8A8AFF, 0 0 40px #8A8AFF;
+    }
+
+    .group { 
+      display: flex; 
+      width: 100%; 
+      justify-content: space-between; 
+      font-size: 0.9rem;
+    }
+    .group a { color: #fff; text-decoration: none; }
+    .group a:nth-child(2) {
+      color: #8A8AFF; 
+      font-weight: 600;
+    }
+
+    #suggestions {
+      background: #2C2E43; 
+      border: 1px solid #555;
+      border-radius: 6px; 
+      margin-top: 5px; 
+      width: 100%;
+      display: none; 
+      flex-direction: column;
+      max-height: 120px; 
+      overflow-y: auto; 
+      z-index: 2000; 
+      position: absolute;
+      top: 100%;
+    }
+    #suggestions div {
+      padding: 8px; 
+      cursor: pointer; 
+      color: #fff;
+    }
+    #suggestions div:hover { background: #444; }
+
+    .welcomeMsg {
+      background: rgba(138, 138, 255, 0.2);
+      border: 1px solid #8A8AFF;
+      border-radius: 10px;
+      padding: 10px 15px;
+      margin-bottom: 10px;
+      text-align: center;
+      color: #8A8AFF;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .signOutBtn {
+      padding: 8px 20px;
+      border-radius: 30px;
+      border: 2px solid #ff6b6b;
+      background: transparent;
+      color: #ff6b6b;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.4s;
+      width: 100%;
+      text-align: center;
+      font-size: 0.9em;
+      display: none;
+      margin-top: -10px;
+    }
+    .signOutBtn:hover {
+      background: #ff6b6b;
+      color: #fff;
+      box-shadow: 0 0 10px #ff6b6b, 0 0 40px #ff6b6b;
+    }
+
+    .clearBtn {
+      background: transparent;
+      border: 2px solid #ff6b6b;
+      color: #ff6b6b;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: 0.4s;
+      font-weight: 500;
+      margin-top: 10px;
+    }
+    .clearBtn:hover {
+      background: #ff6b6b;
+      color: #fff;
+      box-shadow: 0 0 10px #ff6b6b;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 500px) {
+      .box {
+        width: 95%;
+        min-height: 480px;
+      }
+      .login {
+        inset: 30px;
+      }
+      .loginBx {
+        width: 90%;
+        gap: 18px;
+      }
+      .loginBx h2 {
+        font-size: 1.1rem;
+        letter-spacing: 0.15em;
+      }
+      .loginBx input {
+        padding: 10px 18px;
+        font-size: 0.95em;
+      }
+      .rememberBtn {
+        font-size: 0.95em;
+        padding: 10px 18px;
+      }
+      .group {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.85rem;
+      }
+      #suggestions {
+        max-height: 100px;
+      }
+    }
+
+    @media (max-width: 350px) {
+      .box {
+        width: 100%;
+        min-height: 450px;
+      }
+      .login {
+        inset: 25px;
+      }
+      .loginBx h2 {
+        font-size: 1rem;
+      }
+      .loginBx input {
+        padding: 9px 16px;
+        font-size: 0.9em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo">EvoFit</a>
+      <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li id="loginNavLink"><a href="login.html">Login</a></li>
+        <li><a href="support.html">About</a></li>
+        <li><a href="support.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+<div class="box" style="margin-top: 80px;">
+  <div class="login">
+    <div class="loginBx">
+      <h2><i class="fa-solid fa-right-to-bracket"></i> Login <i class="fa-solid fa-heart"></i></h2>
+
+      <div id="welcomeMsg" class="welcomeMsg"></div>
+
+      <button id="signOutBtn" class="signOutBtn" onclick="signOut()">Sign Out</button>
+
+      <div style="position:relative; width:100%;">
+        <input type="text" id="username" placeholder="Username" autocomplete="off">
+        <div id="suggestions"></div>
+      </div>
+
+      <input type="password" id="password" placeholder="Password">
+
+      <button id="rememberBtn" class="rememberBtn">Remember Me</button>
+
+      <input type="submit" value="Sign in" onclick="loginUser()" />
+
+      <div class="group">
+        <a href="#">Forgot Password</a>
+        <a href="#">Sign up</a>
+      </div>
+
+      <button class="clearBtn" onclick="clearAllData()">Clear All Data</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Initialize user storage object
+  const userStorage = {
+    users: [],
+    rememberedUser: null,
+    
+    init() {
+      const stored = localStorage.getItem("evoFitUsers");
+      if (stored) {
+        const data = JSON.parse(stored);
+        this.users = data.users || [];
+        this.rememberedUser = data.rememberedUser || null;
+      }
+      this.save();
+    },
+    
+    save() {
+      localStorage.setItem("evoFitUsers", JSON.stringify({
+        users: this.users,
+        rememberedUser: this.rememberedUser
+      }));
+    },
+    
+    addUser(username, password) {
+      this.users.push({ username, password });
+      this.save();
+    },
+    
+    findUser(username) {
+      return this.users.find(u => u.username === username);
+    },
+    
+    setRememberedUser(username) {
+      this.rememberedUser = username;
+      this.save();
+    },
+    
+    clearRememberedUser() {
+      this.rememberedUser = null;
+      this.save();
+    }
+  };
+
+  // Initialize storage on page load
+  userStorage.init();
+
+  let remember = false;
+  const rememberBtn = document.getElementById("rememberBtn");
+  const usernameInput = document.getElementById("username");
+  const passwordInput = document.getElementById("password");
+  const suggestionsBox = document.getElementById("suggestions");
+  const welcomeMsg = document.getElementById("welcomeMsg");
+  const signOutBtn = document.getElementById("signOutBtn");
+  const signInBtn = document.querySelector('input[type="submit"]');
+
+  let isLoggedIn = false;
+
+  // Check if user is already logged in (session exists)
+  window.addEventListener("load", () => {
+    const activeSession = sessionStorage.getItem('activeSession');
+    if (activeSession) {
+      const session = JSON.parse(activeSession);
+      const username = session.username;
+      
+      // Show already logged in message
+      showLoggedInState(username, false);
+      welcomeMsg.textContent = `Already logged in as ${username}`;
+      welcomeMsg.style.display = "block";
+      return;
+    }
+    
+    // Check if there's a remembered user and auto-login
+    if (userStorage.rememberedUser) {
+      const user = userStorage.findUser(userStorage.rememberedUser);
+      if (user) {
+        usernameInput.value = user.username;
+        passwordInput.value = user.password;
+        remember = true;
+        rememberBtn.classList.add("active");
+        
+        // Auto-login the remembered user (without alert)
+        setTimeout(() => {
+          loginUser(false);
+        }, 500);
+      }
+    }
+  });
+
+  // Remember Me button toggle
+  rememberBtn.addEventListener("click", () => {
+    remember = !remember;
+    rememberBtn.classList.toggle("active", remember);
+  });
+
+  // Login function
+  function loginUser(showAlert = true) {
+  // Check if already logged in
+  const activeSession = sessionStorage.getItem('activeSession');
+  if (activeSession) {
+    const session = JSON.parse(activeSession);
+    const username = session.username;
+    welcomeMsg.textContent = `Already logged in as ${username}`;
+    welcomeMsg.style.display = "block";
+    showLoggedInState(username, false);
+    return;
+  }
+
+  let username = usernameInput.value.trim();
+  let password = passwordInput.value.trim();
+
+  if (!username || !password) {
+    alert("Please enter both username and password!");
+    return;
+  }
+
+  let existing = userStorage.findUser(username);
+
+  if (existing) {
+    if (existing.password !== password) {
+      alert("Wrong password!");
+      return;
+    }
+  } else {
+    userStorage.addUser(username, password);
+  }
+
+  if (remember) {
+    userStorage.setRememberedUser(username);
+  } else {
+    userStorage.clearRememberedUser();
+  }
+
+  if (showAlert) {
+    alert("Login successful! ");
+  }
+  
+  // Set session in sessionStorage (session-based)
+  sessionStorage.setItem('activeSession', JSON.stringify({
+    username: username,
+    password: password,
+    loginTime: new Date().getTime()
+  }));
+  
+  // Set auth flag in sessionStorage
+  sessionStorage.setItem('isLoggedIn', 'true');
+  
+  // Update navbar
+  updateNavbar();
+  
+  showLoggedInState(username, showAlert); // Pass showAlert to enable redirect only if manual login
+}
+
+  // Show logged in state
+  function showLoggedInState(username, shouldRedirect = false) {
+  isLoggedIn = true;
+  welcomeMsg.textContent = `Logged in as ${username}`;
+  welcomeMsg.style.display = "block";
+  signOutBtn.style.display = "block";
+  
+  // Hide login form elements
+  usernameInput.style.display = "none";
+  passwordInput.style.display = "none";
+  rememberBtn.style.display = "none";
+  signInBtn.style.display = "none";
+  document.querySelector('.group').style.display = "none";
+  
+  // Only redirect if explicitly requested (actual login, not auto-fill)
+  if (shouldRedirect) {
+    setTimeout(() => {
+      window.location.href = "index.html";
+    }, 2000);
+  }
+}
+
+  // Sign out function
+  function signOut() {
+    if (confirm("Are you sure you want to sign out?")) {
+      isLoggedIn = false;
+      sessionStorage.removeItem("activeSession");
+      // Clear auth flag from sessionStorage
+      sessionStorage.removeItem('isLoggedIn');
+      
+      usernameInput.value = "";
+      passwordInput.value = "";
+      remember = false;
+      rememberBtn.classList.remove("active");
+      
+      welcomeMsg.style.display = "none";
+      signOutBtn.style.display = "none";
+      
+      // Show login form elements again
+      usernameInput.style.display = "block";
+      passwordInput.style.display = "block";
+      rememberBtn.style.display = "block";
+      signInBtn.style.display = "block";
+      document.querySelector('.group').style.display = "flex";
+      
+      userStorage.clearRememberedUser();
+      
+      // Update navbar
+      updateNavbar();
+      
+      alert("Signed out successfully!");
+      
+      // Redirect to index after logout
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 1000);
+    }
+  }
+
+  // Clear all data function
+  function clearAllData() {
+    if (confirm("This will delete ALL saved usernames and passwords. Are you sure?")) {
+      localStorage.removeItem("evoFitUsers");
+      localStorage.removeItem("userInfo");
+      localStorage.removeItem("dietPlan");
+      localStorage.removeItem("workoutHistory");
+      sessionStorage.removeItem("activeSession");
+      sessionStorage.removeItem("isLoggedIn");
+      
+      userStorage.users = [];
+      userStorage.rememberedUser = null;
+      userStorage.save();
+      
+      usernameInput.value = "";
+      passwordInput.value = "";
+      remember = false;
+      rememberBtn.classList.remove("active");
+      welcomeMsg.style.display = "none";
+      signOutBtn.style.display = "none";
+      
+      // Show login form elements
+      usernameInput.style.display = "block";
+      passwordInput.style.display = "block";
+      rememberBtn.style.display = "block";
+      signInBtn.style.display = "block";
+      document.querySelector('.group').style.display = "flex";
+      
+      alert("All data cleared successfully!");
+      
+      // Refresh the page
+      location.reload();
+    }
+  }
+
+  // Show username suggestions
+  usernameInput.addEventListener("focus", showSuggestions);
+  usernameInput.addEventListener("input", showSuggestions);
+
+  function showSuggestions() {
+    let query = usernameInput.value.toLowerCase();
+    let filtered = userStorage.users.filter(u => u.username.toLowerCase().includes(query));
+
+    suggestionsBox.innerHTML = "";
+    if (filtered.length > 0) {
+      suggestionsBox.style.display = "flex";
+      filtered.forEach(user => {
+        let div = document.createElement("div");
+        div.textContent = user.username;
+        div.onclick = () => {
+          usernameInput.value = user.username;
+          passwordInput.value = user.password;
+          suggestionsBox.style.display = "none";
+        };
+        suggestionsBox.appendChild(div);
+      });
+    } else {
+      suggestionsBox.style.display = "none";
+    }
+  }
+
+  // Close suggestions when clicking outside
+  document.addEventListener("click", (e) => {
+    if (!usernameInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+      suggestionsBox.style.display = "none";
+    }
+  });
+
+  // Allow Enter key to submit
+  passwordInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      loginUser();
+    }
+  });
+
+  // Mobile menu toggle
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  const navLinks = document.getElementById('navLinks');
+
+  if (mobileMenuBtn && navLinks) {
+    mobileMenuBtn.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+      mobileMenuBtn.textContent = navLinks.classList.contains('active') ? '✕' : '☰';
+    });
+  }
+
+  // Update navbar based on login status
+  function updateNavbar() {
+    const loginNavLink = document.getElementById('loginNavLink');
+    if (sessionStorage.getItem('isLoggedIn') === 'true') {
+      if (loginNavLink) loginNavLink.style.display = 'none';
+    } else {
+      if (loginNavLink) loginNavLink.style.display = 'block';
+    }
+  }
+
+  // Check on page load
+  updateNavbar();
+</script>
+
+</body>
+</html>

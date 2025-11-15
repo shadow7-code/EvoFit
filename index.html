@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EvoFit - Your Smart Fitness Companion</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo">EvoFit</a>
+      <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#home">Home</a></li>
+        <li id="dashboardLink" style="display: none;"><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="#tryit">Try It</a></li>
+        <li><a href="support.html">About</a></li>
+        <li><a href="support.html#contact">Contact</a></li>
+        <li><a href="login.html" id="loginLink">Login</a></li>
+        <li><button class="theme-toggle" id="themeToggle">☀️</button></li>
+        <li class="profile-container" id="profileContainer" style="display: none;">
+          <div class="profile-dropdown">
+            <button class="profile-btn" id="profileBtn">👤</button>
+            <div class="profile-menu" id="profileMenu">
+              <div class="profile-header">
+                <span class="profile-username" id="profileUsername">User</span>
+              </div>
+              <hr class="profile-divider">
+              <a href="profile.html" class="profile-link">View Profile</a>
+              <button class="profile-logout" onclick="logoutUser()">Logout</button>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero" id="home">
+    <div class="hero-content">
+      <h1>EvoFit</h1>
+      <p class="hero-description">Your Smart Fitness Companion - Personalized workouts and diet plans tailored just for you</p>
+      <a href="#tryit" class="cta-button">Try It Now</a>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features" id="tryit">
+    <div class="features-container">
+      <h2 class="section-title">Transform Your Fitness Journey</h2>
+      <div class="features-grid">
+        <!-- Workout Plan Card -->
+        <div class="feature-card">
+          <div class="feature-icon">💪</div>
+          <h3>Workout Plan</h3>
+          <p>Get a customized workout routine designed specifically for your fitness level, goals, and available equipment. From beginner to advanced, we've got you covered.</p>
+          <button class="feature-button" onclick="location.href='dashboard.html'">Create Your Workout Plan</button>
+        </div>
+
+        <!-- Diet Plan Card -->
+        <div class="feature-card">
+          <div class="feature-icon">🥗</div>
+          <h3>Diet Plan</h3>
+          <p>Receive a personalized nutrition plan tailored to your dietary preferences, health goals, and lifestyle. Achieve your dream body with smart eating.</p>
+          <button class="feature-button" onclick="location.href='diet.html'">Create Your Diet Plan</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p class="motivational-text">Stay consistent, stay motivated, achieve greatness.</p>
+      <div class="footer-links">
+        <a href="support.html">About Us</a>
+        <a href="support.html#contact">Contact</a>
+        <a href="#privacy">Privacy Policy</a>
+        <a href="#terms">Terms of Service</a>
+      </div>
+      <p class="copyright">© 2025 EvoFit. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EvoFit</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <div class="container">
+    
+    <!-- Header -->
+    <div class="header">
+      <h1>EvoFit Workout</h1>
+      <p>Your Personal Fitness Journey Starts Here</p>
+      <button class="btn btn-logout" onclick="logout()">Logout</button>
+    </div>
+    
+
+    <!-- Dashboard Section -->
+    <div class="dashboard" id="dashboard">
+      <!-- User Details Card -->
+      <div class="card">
+        <h3>
+          <span class="card-icon">👤</span>
+          Personal Profile
+        </h3>
+        <div class="stat-grid">
+          <div class="stat-item">
+            <span class="stat-label">Weight</span>
+            <span class="stat-value" id="userWeight">--</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Height</span>
+            <span class="stat-value" id="userHeight">--</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Fitness Level</span>
+            <span class="stat-value" id="userLevel">--</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Daily Goal</span>
+            <span class="stat-value" id="userTime">--</span>
+          </div>
+        </div>
+        <div id="bmiIndicator" class="bmi-indicator">
+          BMI: <span id="bmiValue">--</span>
+        </div>
+      </div>
+
+      <!-- Stats Card -->
+      <div class="card">
+        <h3>
+          <span class="card-icon">📊</span>
+          Workout Statistics
+        </h3>
+        <div class="stat-grid">
+          <div class="stat-item">
+            <span class="stat-label">Total Time</span>
+            <span class="stat-value" id="totalTime">0 min</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Calories Burned</span>
+            <span class="stat-value" id="totalCalories">0 kcal</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Workouts Completed</span>
+            <span class="stat-value" id="workoutCount">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Current Streak</span>
+            <span class="stat-value" id="currentStreak">0 days</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Workout Control -->
+    <div class="workout-controls" id="workoutControls">
+      <button class="btn btn-start" id="startWorkoutBtn">
+        🚀 Start Today's Workout
+      </button>
+    </div>
+
+    <!-- Workout Plan Section -->
+    <div class="workout-plan" id="workoutPlan">
+      <div class="progress-bar">
+        <div class="progress-info">
+          <span>Progress: <span id="progressText">0/12</span> exercises</span>
+          <span id="workoutTimer">00:00</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <div class="exercises-grid" id="exercisesGrid">
+        <!-- Exercise cards will be inserted here dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- User Input Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-content">
+        <h2>Welcome to FitTracker Pro!</h2>
+        <form id="userForm">
+          <div class="form-group">
+            <label for="weight">Weight (kg)</label>
+            <input type="number" id="weight" name="weight" required min="30" max="300" step="0.1">
+          </div>
+          <div class="form-group">
+            <label for="height">Height (cm)</label>
+            <input type="number" id="height" name="height" required min="100" max="250">
+          </div>
+          <div class="form-group">
+            <label for="level">Fitness Level</label>
+            <select id="level" name="level" required>
+              <option value="">Select your level</option>
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="timePerDay">Time per Day (minutes)</label>
+            <input type="number" id="timePerDay" name="timePerDay" required min="10" max="180">
+          </div>
+          <button type="submit" class="btn btn-block">Start Your Journey</button>
+          <button class="btn btn-block" onclick="window.history.back()">Go Back</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Workout Completion Message -->
+  <div class="completion-message" id="completionMessage">
+    <h2>🎉 Workout Complete!</h2>
+    <p>Fantastic job! You've crushed today's workout!</p>
+    <div class="completion-stats">
+      <div class="completion-stat">
+        <div class="completion-stat-value" id="completionTime">--</div>
+        <div class="completion-stat-label">Minutes</div>
+      </div>
+      <div class="completion-stat">
+        <div class="completion-stat-value" id="completionCalories">--</div>
+        <div class="completion-stat-label">Calories</div>
+      </div>
+    </div>
+    <button class="btn" onclick="closeCompletionMessage()">Continue</button>
+  </div>
+
+  <!-- Reset Button -->
+  <button class="btn btn-reset" id="resetBtn">Reset</button>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <p class="motivational-text">Stay consistent, stay motivated, achieve greatness.</p>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // prevent access without login
+    if (!sessionStorage.getItem('isLoggedIn')) {
+      alert('Please login first to access the dashboard!');
+      window.location.href = 'login.html';
+    }
+
+    // Logout function - clears all sessionStorage flags
+    function logout() {
+      if (confirm('Are you sure you want to logout?')) {
+        // Clear all authentication related data from sessionStorage
+        sessionStorage.removeItem('isLoggedIn');
+        sessionStorage.removeItem('activeSession');
+        
+        alert('Logged out successfully!');
+        window.location.href = 'index.html';
+      }
+    }
+  </script>
+  <script src="dashboard.js"></script>
+</body>
+</html>

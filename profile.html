@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EvoFit - Profile</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Default Dark Theme */
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --accent-color: #818cf8;
+      --accent-hover: #6366f1;
+      --nav-bg: rgba(15, 23, 42, 0.95);
+      --border-color: rgba(129, 140, 248, 0.3);
+      --shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+      --card-bg: #1e293b;
+    }
+
+    [data-theme="light"] {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8f9fa;
+      --text-primary: #1a1a1a;
+      --text-secondary: #666666;
+      --accent-color: #6366f1;
+      --accent-hover: #4f46e5;
+      --nav-bg: rgba(255, 255, 255, 0.95);
+      --border-color: #e5e7eb;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --card-bg: #ffffff;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      transition: background-color 0.3s ease, color 0.3s ease;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Navigation Bar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: var(--nav-bg);
+      backdrop-filter: blur(10px);
+      padding: 1rem 2rem;
+      box-shadow: var(--shadow);
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--accent-color);
+      text-decoration: none;
+      transition: transform 0.3s ease;
+    }
+
+    .logo:hover {
+      transform: scale(1.05);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent-color);
+      background: var(--bg-secondary);
+    }
+
+    .theme-toggle {
+      background: var(--bg-secondary);
+      border: 2px solid var(--border-color);
+      border-radius: 50px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.1);
+      border-color: var(--accent-color);
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+
+    /* Main Content Area */
+    main {
+      flex: 1;
+      margin-top: 70px;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .page-header h1 {
+      font-size: 2.5rem;
+      color: var(--accent-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .page-header p {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+    }
+
+    /* Profile Info Section */
+    .profile-section {
+      background: var(--card-bg);
+      border: 2px solid var(--border-color);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow);
+    }
+
+    .profile-section h2 {
+      color: var(--accent-color);
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .info-item {
+      background: var(--bg-primary);
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+
+    .info-label {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .info-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent-color);
+    }
+
+    .bmi-indicator {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: var(--bg-primary);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      text-align: center;
+      font-size: 1.1rem;
+    }
+
+    .bmi-normal {
+      border-color: #10b981;
+      color: #10b981;
+    }
+
+    .bmi-overweight {
+      border-color: #f59e0b;
+      color: #f59e0b;
+    }
+
+    .bmi-underweight {
+      border-color: #ef4444;
+      color: #ef4444;
+    }
+
+    /* Diet Plan Section */
+    .diet-info {
+      background: var(--card-bg);
+      border: 2px solid var(--border-color);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow);
+    }
+
+    .diet-info h2 {
+      color: var(--accent-color);
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+    }
+
+    .no-diet {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-secondary);
+    }
+
+    .no-diet a {
+      color: var(--accent-color);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .no-diet a:hover {
+      text-decoration: underline;
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--bg-secondary);
+      padding: 3rem 2rem;
+      text-align: center;
+      border-top: 2px solid var(--border-color);
+      margin-top: auto;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .motivational-text {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--accent-color);
+      margin-bottom: 1rem;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent-color);
+    }
+
+    .copyright {
+      margin-top: 1.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .nav-links {
+        position: fixed;
+        top: 70px;
+        left: -100%;
+        flex-direction: column;
+        background: var(--nav-bg);
+        width: 100%;
+        padding: 2rem;
+        box-shadow: var(--shadow);
+        transition: left 0.3s ease;
+        gap: 1rem;
+      }
+
+      .nav-links.active {
+        left: 0;
+      }
+
+      .mobile-menu-btn {
+        display: block;
+      }
+
+      .navbar {
+        padding: 1rem;
+      }
+
+      .page-header h1 {
+        font-size: 2rem;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo">EvoFit</a>
+      <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="login.html">Login</a></li>
+        <li><a href="support.html">About</a></li>
+        <li><a href="support.html#contact">Contact</a></li>
+        <li><button class="theme-toggle" id="themeToggle">☀️</button></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Content Area -->
+  <main>
+    <div class="container">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1>👤 User Profile</h1>
+        <p>Your personal information and fitness details</p>
+      </div>
+
+      <!-- Profile Info Section -->
+      <div class="profile-section">
+        <h2>Personal Information</h2>
+        <div class="info-grid" id="profileInfo">
+          <!-- Info items will be inserted here -->
+        </div>
+        <div class="bmi-indicator" id="bmiIndicator" style="display: none;">
+          BMI: <span id="bmiValue">--</span>
+        </div>
+      </div>
+
+      <!-- Diet Plan Section -->
+      <div class="diet-info">
+        <h2>Diet Plan Information</h2>
+        <div id="dietPlanInfo">
+          <!-- Diet plan info will be inserted here -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p class="motivational-text">Stay consistent, stay motivated, achieve greatness.</p>
+      <div class="footer-links">
+        <a href="support.html">About Us</a>
+        <a href="index.html">Home</a>
+        <a href="support.html#contact">Contact</a>
+      </div>
+      <p class="copyright">© 2025 EvoFit. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Load theme immediately to prevent flash
+    (function() {
+      const html = document.documentElement;
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'light') {
+        html.setAttribute('data-theme', 'light');
+      } else {
+        html.removeAttribute('data-theme');
+      }
+    })();
+
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+
+    // Load theme from localStorage
+    function loadTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'light') {
+        html.setAttribute('data-theme', 'light');
+        if (themeToggle) themeToggle.textContent = '🌙';
+      } else {
+        html.removeAttribute('data-theme');
+        if (themeToggle) themeToggle.textContent = '☀️';
+      }
+    }
+
+    // Apply theme on page load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadTheme);
+    } else {
+      loadTheme();
+    }
+
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        if (html.getAttribute('data-theme') === 'light') {
+          html.removeAttribute('data-theme');
+          themeToggle.textContent = '☀️';
+          localStorage.setItem('theme', 'dark');
+        } else {
+          html.setAttribute('data-theme', 'light');
+          themeToggle.textContent = '🌙';
+          localStorage.setItem('theme', 'light');
+        }
+      });
+    }
+
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const navLinks = document.getElementById('navLinks');
+
+    mobileMenuBtn.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+      mobileMenuBtn.textContent = navLinks.classList.contains('active') ? '✕' : '☰';
+    });
+
+    // Close mobile menu when clicking nav links
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+          navLinks.classList.remove('active');
+          mobileMenuBtn.textContent = '☰';
+        }
+      });
+    });
+
+    // Load and display user profile information
+    function loadProfileInfo() {
+      // Get user info from localStorage
+      const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+      const activeSession = sessionStorage.getItem('activeSession');
+      const username = activeSession ? JSON.parse(activeSession).username : 'User';
+
+      const profileInfo = document.getElementById('profileInfo');
+      
+      if (userInfo.weight && userInfo.height) {
+        profileInfo.innerHTML = `
+          <div class="info-item">
+            <div class="info-label">Username</div>
+            <div class="info-value">${username}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Weight</div>
+            <div class="info-value">${userInfo.weight} kg</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Height</div>
+            <div class="info-value">${userInfo.height} cm</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Fitness Level</div>
+            <div class="info-value">${userInfo.level || 'Not Set'}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Daily Goal</div>
+            <div class="info-value">${userInfo.timePerDay || 'Not Set'} min</div>
+          </div>
+        `;
+
+        // Calculate and display BMI
+        if (userInfo.weight && userInfo.height) {
+          const heightInMeters = userInfo.height / 100;
+          const bmi = userInfo.weight / (heightInMeters * heightInMeters);
+          const bmiIndicator = document.getElementById('bmiIndicator');
+          const bmiValue = document.getElementById('bmiValue');
+          
+          bmiValue.textContent = bmi.toFixed(2);
+          bmiIndicator.style.display = 'block';
+          
+          // Remove all BMI classes
+          bmiIndicator.classList.remove('bmi-normal', 'bmi-overweight', 'bmi-underweight');
+          
+          // Add appropriate BMI class
+          if (bmi < 18.5) {
+            bmiIndicator.classList.add('bmi-underweight');
+            bmiIndicator.innerHTML = `BMI: ${bmi.toFixed(2)} (Underweight)`;
+          } else if (bmi >= 18.5 && bmi < 25) {
+            bmiIndicator.classList.add('bmi-normal');
+            bmiIndicator.innerHTML = `BMI: ${bmi.toFixed(2)} (Normal)`;
+          } else {
+            bmiIndicator.classList.add('bmi-overweight');
+            bmiIndicator.innerHTML = `BMI: ${bmi.toFixed(2)} (Overweight)`;
+          }
+        }
+      } else {
+        profileInfo.innerHTML = `
+          <div class="info-item" style="grid-column: 1 / -1; text-align: center;">
+            <div class="info-label">No Profile Data</div>
+            <div class="info-value" style="font-size: 1rem; margin-top: 1rem;">
+              <a href="dashboard.html" style="color: var(--accent-color); text-decoration: none;">Create your profile</a>
+            </div>
+          </div>
+        `;
+      }
+
+      // Load diet plan info
+      const dietPlan = JSON.parse(localStorage.getItem('dietPlan') || 'null');
+      const dietPlanInfo = document.getElementById('dietPlanInfo');
+      
+      if (dietPlan && dietPlan.userData) {
+        const data = dietPlan.userData;
+        let goalText = '';
+        if (data.goal === 'weight-loss') {
+          goalText = '📉 Weight Loss';
+        } else if (data.goal === 'muscle-gain') {
+          goalText = '💪 Muscle Gain';
+        } else {
+          goalText = '⚖️ Maintenance';
+        }
+
+        dietPlanInfo.innerHTML = `
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">Diet Type</div>
+              <div class="info-value">${data.preference === 'vegetarian' ? '🥬 Vegetarian' : '🍗 Non-Vegetarian'}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Fitness Goal</div>
+              <div class="info-value">${goalText}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Target Calories</div>
+              <div class="info-value">${Math.round(data.targetCalories || 0)} cal/day</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Age</div>
+              <div class="info-value">${data.age || 'Not Set'}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Gender</div>
+              <div class="info-value">${data.gender ? data.gender.charAt(0).toUpperCase() + data.gender.slice(1) : 'Not Set'}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Activity Level</div>
+              <div class="info-value">${data.activity ? data.activity.charAt(0).toUpperCase() + data.activity.slice(1) : 'Not Set'}</div>
+            </div>
+          </div>
+          <div style="margin-top: 1.5rem; text-align: center; display: flex; gap: 1rem; justify-content: center;">
+            <a href="diet.html" style="color: var(--accent-color); text-decoration: none; font-weight: 600;">View Full Diet Plan →</a>
+            <span style="color: var(--text-secondary);">|</span>
+            <a href="login.html" style="color: var(--accent-color); text-decoration: none; font-weight: 600;">Edit User Details →</a>
+          </div>
+        `;
+      } else {
+        dietPlanInfo.innerHTML = `
+          <div class="no-diet">
+            <p>No diet plan created yet.</p>
+            <p><a href="diet.html">Create your diet plan</a></p>
+          </div>
+        `;
+      }
+    }
+
+    // Check if user is logged in
+    window.addEventListener('DOMContentLoaded', () => {
+      if (!sessionStorage.getItem('isLoggedIn')) {
+        alert('Please login first to view your profile!');
+        window.location.href = 'login.html';
+      } else {
+        loadProfileInfo();
+      }
+    });
+  </script>
+</body>
+</html>
+

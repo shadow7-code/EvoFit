@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EvoFit - Diet Plan</title>
+  <link rel="stylesheet" href="diet.css">
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo">EvoFit</a>
+      <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="login.html">Login</a></li>
+        <li><a href="support.html">About</a></li>
+        <li><a href="support.html#contact">Contact</a></li>
+        <li><button class="theme-toggle" id="themeToggle">☀️</button></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Content Area -->
+  <main>
+    <div class="container">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1>🥗 Your Personalized Diet Plan</h1>
+        <p>Fuel your body with the right nutrition for optimal results</p>
+        <div class="goal-badge" id="goalBadge" style="display: none;">
+          <span id="goalText"></span>
+        </div>
+      </div>
+
+      <!-- Diet Type Selector -->
+      <div class="week-selector" id="dietSelector" style="display: none;">
+        <button class="week-btn active" data-diet="vegetarian">🥬 Vegetarian</button>
+        <button class="week-btn" data-diet="non-vegetarian">🍗 Non-Vegetarian</button>
+      </div>
+
+      <!-- Nutrition Summary -->
+      <div class="nutrition-summary" id="nutritionSummary" style="display: none;">
+        <h2 style="color: var(--accent-color); margin-bottom: 1rem;">📊 Daily Nutrition Summary</h2>
+        <div class="nutrition-grid">
+          <div class="nutrition-item">
+            <span class="nutrition-value" id="totalCalories">2000</span>
+            <span class="nutrition-label">Calories</span>
+          </div>
+          <div class="nutrition-item">
+            <span class="nutrition-value" id="totalProtein">150g</span>
+            <span class="nutrition-label">Protein</span>
+          </div>
+          <div class="nutrition-item">
+            <span class="nutrition-value" id="totalCarbs">220g</span>
+            <span class="nutrition-label">Carbs</span>
+          </div>
+          <div class="nutrition-item">
+            <span class="nutrition-value" id="totalFat">60g</span>
+            <span class="nutrition-label">Fat</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Meals Container -->
+      <div class="meals-container" id="mealsContainer">
+        <!-- Meal cards will be inserted here dynamically -->
+      </div>
+
+      <!-- Tips Section -->
+      <div class="tips-section" id="tipsSection" style="display: none;">
+        <h2>💡 Important Guidelines</h2>
+        <ul class="tips-list">
+          <li><strong>🔍 Weigh Your Food:</strong> Weigh all your food after cooking for better accuracy and results.</li>
+          <li><strong>⚖️ Don't Modify:</strong> Don't switch meals or tweak quantities - it will disturb the caloric balance.</li>
+          <li><strong>💧 Stay Hydrated:</strong> Drink at least 3-4 liters of water every day.</li>
+          <li><strong>💊 Supplements:</strong> Consider adding Multivitamins, Fish Oil, Vitamin D3, Vitamin C, Iron & Folic Acid (for women), and Zinc Magnesium Calcium supplements.</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal for Initial Setup -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <h2>🎯 Let's Personalize Your Diet</h2>
+      <p>Answer a few questions to get your customized meal plan</p>
+      
+      <!-- Step 1: Dietary Preference -->
+      <div class="modal-step" id="step1">
+        <div class="step-title">Step 1: Choose Your Diet Type</div>
+        <div class="preference-buttons">
+          <button class="preference-btn" data-preference="vegetarian">
+            🥬 Vegetarian
+          </button>
+          <button class="preference-btn" data-preference="non-vegetarian">
+            🍗 Non-Vegetarian
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2: Fitness Goal -->
+      <div class="modal-step" id="step2" style="display: none;">
+        <div class="step-title">Step 2: What's Your Goal?</div>
+        <div class="goal-buttons">
+          <button class="goal-btn" data-goal="weight-loss">
+            📉 Weight Loss (Calorie Deficit)
+          </button>
+          <button class="goal-btn" data-goal="muscle-gain">
+            💪 Muscle Gain (Calorie Surplus)
+          </button>
+          <button class="goal-btn" data-goal="maintenance">
+            ⚖️ Maintenance (Balanced)
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3: Body Details -->
+      <div class="modal-step" id="step3" style="display: none;">
+        <div class="step-title">Step 3: Tell Us About Yourself</div>
+        <form id="bodyDetailsForm">
+          <div class="form-group">
+            <label for="age">Age (years)</label>
+            <input type="number" id="age" required min="15" max="100">
+          </div>
+          <div class="form-group">
+            <label for="gender">Gender</label>
+            <select id="gender" required>
+              <option value="">Select</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="weight">Current Weight (kg)</label>
+            <input type="number" id="weight" required min="30" max="300" step="0.1">
+          </div>
+          <div class="form-group">
+            <label for="height">Height (cm)</label>
+            <input type="number" id="height" required min="100" max="250">
+          </div>
+          <div class="form-group">
+            <label for="activity">Activity Level</label>
+            <select id="activity" required>
+              <option value="">Select</option>
+              <option value="sedentary">Sedentary (little or no exercise)</option>
+              <option value="light">Light (exercise 1-3 days/week)</option>
+              <option value="moderate">Moderate (exercise 3-5 days/week)</option>
+              <option value="active">Active (exercise 6-7 days/week)</option>
+              <option value="very-active">Very Active (intense exercise daily)</option>
+            </select>
+          </div>
+          
+          <div class="calculated-info" id="calculatedInfo" style="display: none;">
+            <p><strong>Your BMR:</strong> <span id="bmrValue"></span> calories/day</p>
+            <p><strong>Your TDEE:</strong> <span id="tdeeValue"></span> calories/day</p>
+            <p><strong>Target Calories:</strong> <span id="targetCalories"></span> calories/day</p>
+          </div>
+
+          <button type="submit" class="btn-submit" id="submitBtn">Generate My Diet Plan</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p class="motivational-text">Eat Clean. Stay Lean. Build Your Dream.</p>
+      <div class="footer-links">
+        <a href="support.html">About Us</a>
+        <a href="index.html">Home</a>
+        <a href="support.html#contact">Contact</a>
+      </div>
+      <p class="copyright">© 2025 EvoFit. All rights reserved.</p>
+    </div>
+  </footer>
+  <script src="diet.js"></script>
+</body>
+</html>
