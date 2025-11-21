@@ -4,16 +4,74 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EvoFit</title>
+  <script>
+    (function() {
+      try {
+        const state = JSON.parse(localStorage.getItem('evoFitApp') || '{}');
+        if (state.theme === 'light') {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      } catch (error) {
+        localStorage.removeItem('evoFitApp');
+      }
+    })();
+    (function() {
+      document.documentElement.dataset.auth = 'pending';
+      const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
+      if (!isLoggedIn) {
+        const target = window.location.pathname.split('/').pop() || 'dashboard.html';
+        window.location.replace(`login.html?redirect=${encodeURIComponent(target)}`);
+      } else {
+        document.documentElement.dataset.auth = 'granted';
+      }
+    })();
+  </script>
+  <style>
+    html[data-auth="pending"] body {
+      visibility: hidden;
+    }
+  </style>
+  <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="dashboard.css">
 </head>
 <body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo">EvoFit</a>
+      <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html#home">Home</a></li>
+        <li id="dashboardLink" style="display: none;"><a href="dashboard.html">Workout</a></li>
+        <li><a href="diet.html">Diet</a></li>
+        <li><a href="support.html">About</a></li>
+        <li><a href="support.html#contact">Contact</a></li>
+        <li><a href="login.html" id="loginLink">Login</a></li>
+        <li><button class="theme-toggle" id="themeToggle">☀️</button></li>
+        <li class="profile-container" id="profileContainer" style="display: none;">
+          <div class="profile-dropdown">
+            <button class="profile-btn" id="profileBtn">👤</button>
+            <div class="profile-menu" id="profileMenu">
+              <div class="profile-header">
+                <span class="profile-username" id="profileUsername">User</span>
+              </div>
+              <hr class="profile-divider">
+              <a href="profile.html" class="profile-link">View Profile</a>
+              <button class="profile-logout" onclick="logoutUser()">Logout</button>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="dashboard-shell">
   <div class="container">
     
     <!-- Header -->
     <div class="header">
       <h1>EvoFit Workout</h1>
       <p>Your Personal Fitness Journey Starts Here</p>
-      <button class="btn btn-logout" onclick="logout()">Logout</button>
     </div>
     
 
@@ -37,10 +95,6 @@
           <div class="stat-item">
             <span class="stat-label">Fitness Level</span>
             <span class="stat-value" id="userLevel">--</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Daily Goal</span>
-            <span class="stat-value" id="userTime">--</span>
           </div>
         </div>
         <div id="bmiIndicator" class="bmi-indicator">
@@ -77,6 +131,18 @@
 
     <!-- Workout Control -->
     <div class="workout-controls" id="workoutControls">
+      <div class="level-switcher">
+        <div class="level-header">
+          <h3>Adjust Workout Intensity</h3>
+          <span class="current-level" id="currentLevelLabel">--</span>
+        </div>
+        <div class="level-options" id="levelOptions">
+          <button type="button" class="level-btn" data-level="Beginner">Beginner</button>
+          <button type="button" class="level-btn" data-level="Intermediate">Intermediate</button>
+          <button type="button" class="level-btn" data-level="Advanced">Advanced</button>
+        </div>
+        <p class="level-hint">Switch levels anytime to instantly adjust your rep targets.</p>
+      </div>
       <button class="btn btn-start" id="startWorkoutBtn">
         🚀 Start Today's Workout
       </button>
@@ -98,13 +164,45 @@
         <!-- Exercise cards will be inserted here dynamically -->
       </div>
     </div>
+
+    <div class="card monthly-progress" id="monthlyProgress">
+      <h3>
+        <span class="card-icon">📅</span>
+        30-Day Progress
+      </h3>
+      <div class="monthly-grid">
+        <div class="monthly-item">
+          <p class="monthly-label">Workouts</p>
+          <p class="monthly-value" id="monthlyWorkouts">0</p>
+        </div>
+        <div class="monthly-item">
+          <p class="monthly-label">Minutes</p>
+          <p class="monthly-value" id="monthlyMinutes">0</p>
+        </div>
+        <div class="monthly-item">
+          <p class="monthly-label">Calories</p>
+          <p class="monthly-value" id="monthlyCalories">0</p>
+        </div>
+        <div class="monthly-item">
+          <p class="monthly-label">Consistency</p>
+          <p class="monthly-value" id="monthlyConsistency">0%</p>
+        </div>
+      </div>
+      <div class="monthly-progress-bar">
+        <div class="monthly-progress-fill" id="monthlyProgressFill"></div>
+      </div>
+      <div class="recent-activity">
+        <p class="monthly-label">Recent Sessions</p>
+        <ul id="recentActivity"></ul>
+      </div>
+    </div>
   </div>
 
   <!-- User Input Modal -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
       <div class="modal-content">
-        <h2>Welcome to Evofit Pro!</h2>
+        <h2>Welcome to FitTracker Pro!</h2>
         <form id="userForm">
           <div class="form-group">
             <label for="weight">Weight (kg)</label>
@@ -122,10 +220,6 @@
               <option value="Intermediate">Intermediate</option>
               <option value="Advanced">Advanced</option>
             </select>
-          </div>
-          <div class="form-group">
-            <label for="timePerDay">Time per Day (minutes)</label>
-            <input type="number" id="timePerDay" name="timePerDay" required min="10" max="180">
           </div>
           <button type="submit" class="btn btn-block">Start Your Journey</button>
           <button class="btn btn-block" onclick="window.history.back()">Go Back</button>
@@ -162,26 +256,10 @@
       </div>
     </div>
   </footer>
+  </main>
 
-  <script>
-    // prevent access without login
-    if (!sessionStorage.getItem('isLoggedIn')) {
-      alert('Please login first to access the dashboard!');
-      window.location.href = 'login.html';
-    }
-
-    // Logout function - clears all sessionStorage flags
-    function logout() {
-      if (confirm('Are you sure you want to logout?')) {
-        // Clear all authentication related data from sessionStorage
-        sessionStorage.removeItem('isLoggedIn');
-        sessionStorage.removeItem('activeSession');
-        
-        alert('Logged out successfully!');
-        window.location.href = 'index.html';
-      }
-    }
-  </script>
+  <script src="app-storage.js"></script>
+  <script src="script.js"></script>
   <script src="dashboard.js"></script>
 </body>
 </html>

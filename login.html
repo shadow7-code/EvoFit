@@ -4,18 +4,49 @@
   <meta charset="UTF-8">
   <title>Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    (function() {
+      try {
+        const state = JSON.parse(localStorage.getItem('evoFitApp') || '{}');
+        if (state.theme === 'light') {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      } catch (error) {
+        localStorage.removeItem('evoFitApp');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <style>
+    :root {
+      --login-frame-bg: #2c2e43;
+      --login-frame-border: #1a1a2e;
+      --login-glass-bg: rgba(0, 0, 0, 0.25);
+      --login-input-bg: rgba(0, 0, 0, 0.1);
+      --login-input-color: #ffffff;
+      --login-placeholder: #999999;
+    }
+
+    [data-theme="light"] {
+      --login-frame-bg: #ffffff;
+      --login-frame-border: #e5e7eb;
+      --login-glass-bg: rgba(255, 255, 255, 0.9);
+      --login-input-bg: rgba(255, 255, 255, 0.9);
+      --login-input-color: #1a1a1a;
+      --login-placeholder: #666666;
+    }
+
     /* Navigation Bar */
     .navbar {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
-      background: rgba(15, 23, 42, 0.95);
+      background: var(--nav-bg);
       backdrop-filter: blur(10px);
       padding: 1rem 2rem;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+      box-shadow: var(--shadow);
       z-index: 2000;
       transition: all 0.3s ease;
     }
@@ -31,7 +62,7 @@
     .logo {
       font-size: 1.75rem;
       font-weight: 700;
-      color: #818cf8;
+      color: var(--accent-color);
       text-decoration: none;
       transition: transform 0.3s ease;
     }
@@ -48,7 +79,7 @@
     }
 
     .nav-links a {
-      color: #f1f5f9;
+      color: var(--text-primary);
       text-decoration: none;
       font-weight: 500;
       transition: color 0.3s ease;
@@ -57,8 +88,8 @@
     }
 
     .nav-links a:hover {
-      color: #818cf8;
-      background: rgba(30, 41, 59, 0.5);
+      color: var(--accent-color);
+      background: var(--bg-secondary);
     }
 
     .mobile-menu-btn {
@@ -66,7 +97,7 @@
       background: none;
       border: none;
       font-size: 1.5rem;
-      color: #f1f5f9;
+      color: var(--text-primary);
       cursor: pointer;
     }
 
@@ -103,8 +134,10 @@
     body {
       display: flex; justify-content: center; align-items: center;
       min-height: 100vh;
-      background: #1A1A2E; 
+      background: var(--bg-primary); 
+      color: var(--text-primary);
       padding: 20px;
+      transition: background 0.3s ease, color 0.3s ease;
     }
 
     @property --a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
@@ -138,8 +171,8 @@
     }
     .box::after {
       content: ""; position: absolute; inset: 4px;
-      background: #2C2E43; 
-      border-radius: 15px; border: 8px solid #1A1A2E; 
+      background: var(--login-frame-bg); 
+      border-radius: 15px; border: 8px solid var(--login-frame-border); 
     }
 
     .login {
@@ -150,11 +183,11 @@
       align-items: center;
       border-radius: 10px; 
       flex-direction: column; 
-      background: rgba(0,0,0,0.2);
+      background: var(--login-glass-bg);
       z-index: 1000; 
       box-shadow: inset 0 10px 20px rgba(0,0,0,0.5);
       border-bottom: 2px solid rgba(255,255,255,0.5);
-      color: #fff; 
+      color: var(--text-primary); 
       overflow: hidden;
     }
 
@@ -186,12 +219,12 @@
       padding: 10px 20px; 
       outline: none; 
       font-size: 1em;
-      color: #fff; 
-      background: rgba(0,0,0,0.1);
-      border: 2px solid #fff; 
+      color: var(--login-input-color); 
+      background: var(--login-input-bg);
+      border: 2px solid var(--border-color); 
       border-radius: 30px;
     }
-    .loginBx input::placeholder { color: #999; }
+    .loginBx input::placeholder { color: var(--login-placeholder); }
 
     .loginBx input[type="submit"] {
       background: #8A8AFF; 
@@ -369,10 +402,26 @@
       <a href="index.html" class="logo">EvoFit</a>
       <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
       <ul class="nav-links" id="navLinks">
-        <li><a href="index.html">Home</a></li>
-        <li id="loginNavLink"><a href="login.html">Login</a></li>
+        <li><a href="index.html#home">Home</a></li>
+        <li id="dashboardLink" style="display: none;"><a href="dashboard.html">Workout</a></li>
+        <li><a href="diet.html">Diet</a></li>
         <li><a href="support.html">About</a></li>
         <li><a href="support.html#contact">Contact</a></li>
+        <li><a href="login.html" id="loginLink">Login</a></li>
+        <li><button class="theme-toggle" id="themeToggle">☀️</button></li>
+        <li class="profile-container" id="profileContainer" style="display: none;">
+          <div class="profile-dropdown">
+            <button class="profile-btn" id="profileBtn">👤</button>
+            <div class="profile-menu" id="profileMenu">
+              <div class="profile-header">
+                <span class="profile-username" id="profileUsername">User</span>
+              </div>
+              <hr class="profile-divider">
+              <a href="profile.html" class="profile-link">View Profile</a>
+              <button class="profile-logout" onclick="logoutUser()">Logout</button>
+            </div>
+          </div>
+        </li>
       </ul>
     </div>
   </nav>
@@ -407,53 +456,9 @@
   </div>
 </div>
 
+<script src="app-storage.js"></script>
+<script src="script.js"></script>
 <script>
-  // Initialize user storage object
-  const userStorage = {
-    users: [],
-    rememberedUser: null,
-    
-    init() {
-      const stored = localStorage.getItem("evoFitUsers");
-      if (stored) {
-        const data = JSON.parse(stored);
-        this.users = data.users || [];
-        this.rememberedUser = data.rememberedUser || null;
-      }
-      this.save();
-    },
-    
-    save() {
-      localStorage.setItem("evoFitUsers", JSON.stringify({
-        users: this.users,
-        rememberedUser: this.rememberedUser
-      }));
-    },
-    
-    addUser(username, password) {
-      this.users.push({ username, password });
-      this.save();
-    },
-    
-    findUser(username) {
-      return this.users.find(u => u.username === username);
-    },
-    
-    setRememberedUser(username) {
-      this.rememberedUser = username;
-      this.save();
-    },
-    
-    clearRememberedUser() {
-      this.rememberedUser = null;
-      this.save();
-    }
-  };
-
-  // Initialize storage on page load
-  userStorage.init();
-
-  let remember = false;
   const rememberBtn = document.getElementById("rememberBtn");
   const usernameInput = document.getElementById("username");
   const passwordInput = document.getElementById("password");
@@ -461,261 +466,201 @@
   const welcomeMsg = document.getElementById("welcomeMsg");
   const signOutBtn = document.getElementById("signOutBtn");
   const signInBtn = document.querySelector('input[type="submit"]');
+  const formActions = document.querySelector('.group');
+  const redirectTarget = new URLSearchParams(window.location.search).get('redirect') || 'dashboard.html';
 
-  let isLoggedIn = false;
+  let remember = false;
 
-  // Check if user is already logged in (session exists)
-  window.addEventListener("load", () => {
-    const activeSession = sessionStorage.getItem('activeSession');
-    if (activeSession) {
-      const session = JSON.parse(activeSession);
-      const username = session.username;
-      
-      // Show already logged in message
-      showLoggedInState(username, false);
-      welcomeMsg.textContent = `Already logged in as ${username}`;
-      welcomeMsg.style.display = "block";
+  function getUsersMap() {
+    return window.EvoFitStorage?.readState?.().users || {};
+  }
+
+  function findUser(username) {
+    if (!username) return null;
+    const users = getUsersMap();
+    return users[username] || null;
+  }
+
+  function getAllUsernames() {
+    return Object.keys(getUsersMap());
+  }
+
+  function setRememberedUser(username) {
+    if (remember) {
+      window.EvoFitStorage?.setRememberedUser?.(username);
+    } else {
+      window.EvoFitStorage?.setRememberedUser?.(null);
+    }
+  }
+
+  function showBanner(message) {
+    welcomeMsg.textContent = message;
+    welcomeMsg.style.display = "block";
+  }
+
+  function hideBanner() {
+    welcomeMsg.style.display = "none";
+  }
+
+  function toggleForm(enabled) {
+    const displayValue = enabled ? "block" : "none";
+    usernameInput.style.display = displayValue;
+    passwordInput.style.display = displayValue;
+    rememberBtn.style.display = displayValue;
+    signInBtn.style.display = displayValue;
+    if (formActions) {
+      formActions.style.display = enabled ? "flex" : "none";
+    }
+  }
+
+  function completeLogin(username, showFeedback = true) {
+    if (showFeedback) {
+      showBanner(`Welcome ${username}! Taking you to your plan...`);
+    }
+
+    setTimeout(() => {
+      window.location.replace(redirectTarget);
+    }, showFeedback ? 600 : 0);
+  }
+
+  function loginUser(showFeedback = true) {
+    const activeUsername = window.EvoFitAuth?.getActiveUsername?.();
+    if (activeUsername) {
+      showBanner(`Already logged in as ${activeUsername}`);
+      toggleForm(false);
+      signOutBtn.style.display = "block";
       return;
     }
-    
-    // Check if there's a remembered user and auto-login
-    if (userStorage.rememberedUser) {
-      const user = userStorage.findUser(userStorage.rememberedUser);
-      if (user) {
-        usernameInput.value = user.username;
-        passwordInput.value = user.password;
-        remember = true;
-        rememberBtn.classList.add("active");
-        
-        // Auto-login the remembered user (without alert)
-        setTimeout(() => {
-          loginUser(false);
-        }, 500);
-      }
+
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    if (!username || !password) {
+      alert("Please enter both username and password!");
+      return;
     }
-  });
 
-  // Remember Me button toggle
-  rememberBtn.addEventListener("click", () => {
-    remember = !remember;
-    rememberBtn.classList.toggle("active", remember);
-  });
+    const existing = findUser(username);
 
-  // Login function
-  function loginUser(showAlert = true) {
-  // Check if already logged in
-  const activeSession = sessionStorage.getItem('activeSession');
-  if (activeSession) {
-    const session = JSON.parse(activeSession);
-    const username = session.username;
-    welcomeMsg.textContent = `Already logged in as ${username}`;
-    welcomeMsg.style.display = "block";
-    showLoggedInState(username, false);
-    return;
-  }
-
-  let username = usernameInput.value.trim();
-  let password = passwordInput.value.trim();
-
-  if (!username || !password) {
-    alert("Please enter both username and password!");
-    return;
-  }
-
-  let existing = userStorage.findUser(username);
-
-  if (existing) {
-    if (existing.password !== password) {
+    if (existing && existing.password && existing.password !== password) {
       alert("Wrong password!");
       return;
     }
-  } else {
-    userStorage.addUser(username, password);
+
+    window.EvoFitStorage?.setUserPassword?.(username, password);
+    setRememberedUser(username);
+
+    sessionStorage.setItem('activeSession', JSON.stringify({
+      username,
+      loginTime: Date.now()
+    }));
+    sessionStorage.setItem('isLoggedIn', 'true');
+
+    toggleForm(false);
+    signOutBtn.style.display = "block";
+    completeLogin(username, showFeedback);
   }
 
-  if (remember) {
-    userStorage.setRememberedUser(username);
-  } else {
-    userStorage.clearRememberedUser();
+  function showLoggedInState(username) {
+    toggleForm(false);
+    signOutBtn.style.display = "block";
+    showBanner(`Already logged in as ${username}`);
   }
 
-  if (showAlert) {
-    alert("Login successful! ");
-  }
-  
-  // Set session in sessionStorage (session-based)
-  sessionStorage.setItem('activeSession', JSON.stringify({
-    username: username,
-    password: password,
-    loginTime: new Date().getTime()
-  }));
-  
-  // Set auth flag in sessionStorage
-  sessionStorage.setItem('isLoggedIn', 'true');
-  
-  // Update navbar
-  updateNavbar();
-  
-  showLoggedInState(username, showAlert); // Pass showAlert to enable redirect only if manual login
-}
-
-  // Show logged in state
-  function showLoggedInState(username, shouldRedirect = false) {
-  isLoggedIn = true;
-  welcomeMsg.textContent = `Logged in as ${username}`;
-  welcomeMsg.style.display = "block";
-  signOutBtn.style.display = "block";
-  
-  // Hide login form elements
-  usernameInput.style.display = "none";
-  passwordInput.style.display = "none";
-  rememberBtn.style.display = "none";
-  signInBtn.style.display = "none";
-  document.querySelector('.group').style.display = "none";
-  
-  // Only redirect if explicitly requested (actual login, not auto-fill)
-  if (shouldRedirect) {
-    setTimeout(() => {
-      window.location.href = "index.html";
-    }, 2000);
-  }
-}
-
-  // Sign out function
   function signOut() {
-    if (confirm("Are you sure you want to sign out?")) {
-      isLoggedIn = false;
-      sessionStorage.removeItem("activeSession");
-      // Clear auth flag from sessionStorage
-      sessionStorage.removeItem('isLoggedIn');
-      
-      usernameInput.value = "";
-      passwordInput.value = "";
-      remember = false;
-      rememberBtn.classList.remove("active");
-      
-      welcomeMsg.style.display = "none";
-      signOutBtn.style.display = "none";
-      
-      // Show login form elements again
-      usernameInput.style.display = "block";
-      passwordInput.style.display = "block";
-      rememberBtn.style.display = "block";
-      signInBtn.style.display = "block";
-      document.querySelector('.group').style.display = "flex";
-      
-      userStorage.clearRememberedUser();
-      
-      // Update navbar
-      updateNavbar();
-      
-      alert("Signed out successfully!");
-      
-      // Redirect to index after logout
-      setTimeout(() => {
-        window.location.href = "index.html";
-      }, 1000);
+    if (!confirm("Are you sure you want to sign out?")) {
+      return;
     }
+
+    window.EvoFitAuth?.clearSession?.();
+    window.EvoFitStorage?.setRememberedUser?.(null);
+    remember = false;
+    rememberBtn.classList.remove("active");
+
+    usernameInput.value = "";
+    passwordInput.value = "";
+    hideBanner();
+    signOutBtn.style.display = "none";
+    toggleForm(true);
   }
 
-  // Clear all data function
   function clearAllData() {
-    if (confirm("This will delete ALL saved usernames and passwords. Are you sure?")) {
-      localStorage.removeItem("evoFitUsers");
-      localStorage.removeItem("userInfo");
-      localStorage.removeItem("dietPlan");
-      localStorage.removeItem("workoutHistory");
-      sessionStorage.removeItem("activeSession");
-      sessionStorage.removeItem("isLoggedIn");
-      
-      userStorage.users = [];
-      userStorage.rememberedUser = null;
-      userStorage.save();
-      
-      usernameInput.value = "";
-      passwordInput.value = "";
-      remember = false;
-      rememberBtn.classList.remove("active");
-      welcomeMsg.style.display = "none";
-      signOutBtn.style.display = "none";
-      
-      // Show login form elements
-      usernameInput.style.display = "block";
-      passwordInput.style.display = "block";
-      rememberBtn.style.display = "block";
-      signInBtn.style.display = "block";
-      document.querySelector('.group').style.display = "flex";
-      
-      alert("All data cleared successfully!");
-      
-      // Refresh the page
-      location.reload();
+    if (!confirm("This will delete ALL saved usernames, passwords, and plans. Continue?")) {
+      return;
     }
+
+    localStorage.removeItem('evoFitApp');
+    sessionStorage.removeItem('activeSession');
+    sessionStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('userInfo');
+    localStorage.removeItem('dietPlan');
+    localStorage.removeItem('workoutHistory');
+    window.location.reload();
   }
 
-  // Show username suggestions
+  function showSuggestions() {
+    const query = usernameInput.value.toLowerCase();
+    const filtered = getAllUsernames()
+      .filter(name => name.toLowerCase().includes(query))
+      .map(name => ({ username: name, password: findUser(name)?.password || '' }));
+
+    suggestionsBox.innerHTML = "";
+    if (filtered.length === 0) {
+      suggestionsBox.style.display = "none";
+      return;
+    }
+
+    suggestionsBox.style.display = "flex";
+    filtered.forEach(user => {
+      const div = document.createElement("div");
+      div.textContent = user.username;
+      div.onclick = () => {
+        usernameInput.value = user.username;
+        passwordInput.value = user.password || "";
+        suggestionsBox.style.display = "none";
+      };
+      suggestionsBox.appendChild(div);
+    });
+  }
+
   usernameInput.addEventListener("focus", showSuggestions);
   usernameInput.addEventListener("input", showSuggestions);
 
-  function showSuggestions() {
-    let query = usernameInput.value.toLowerCase();
-    let filtered = userStorage.users.filter(u => u.username.toLowerCase().includes(query));
-
-    suggestionsBox.innerHTML = "";
-    if (filtered.length > 0) {
-      suggestionsBox.style.display = "flex";
-      filtered.forEach(user => {
-        let div = document.createElement("div");
-        div.textContent = user.username;
-        div.onclick = () => {
-          usernameInput.value = user.username;
-          passwordInput.value = user.password;
-          suggestionsBox.style.display = "none";
-        };
-        suggestionsBox.appendChild(div);
-      });
-    } else {
-      suggestionsBox.style.display = "none";
-    }
-  }
-
-  // Close suggestions when clicking outside
   document.addEventListener("click", (e) => {
     if (!usernameInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
       suggestionsBox.style.display = "none";
     }
   });
 
-  // Allow Enter key to submit
   passwordInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
       loginUser();
     }
   });
 
-  // Mobile menu toggle
-  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-  const navLinks = document.getElementById('navLinks');
+  rememberBtn.addEventListener("click", () => {
+    remember = !remember;
+    rememberBtn.classList.toggle("active", remember);
+  });
 
-  if (mobileMenuBtn && navLinks) {
-    mobileMenuBtn.addEventListener('click', () => {
-      navLinks.classList.toggle('active');
-      mobileMenuBtn.textContent = navLinks.classList.contains('active') ? '✕' : '☰';
-    });
-  }
-
-  // Update navbar based on login status
-  function updateNavbar() {
-    const loginNavLink = document.getElementById('loginNavLink');
-    if (sessionStorage.getItem('isLoggedIn') === 'true') {
-      if (loginNavLink) loginNavLink.style.display = 'none';
-    } else {
-      if (loginNavLink) loginNavLink.style.display = 'block';
+  window.addEventListener("load", () => {
+    const activeUsername = window.EvoFitAuth?.getActiveUsername?.();
+    if (activeUsername) {
+      showLoggedInState(activeUsername);
+      return;
     }
-  }
 
-  // Check on page load
-  updateNavbar();
+    const rememberedUser = window.EvoFitStorage?.getRememberedUser?.();
+    if (rememberedUser) {
+      const user = findUser(rememberedUser);
+      if (user) {
+        usernameInput.value = rememberedUser;
+        passwordInput.value = user.password || "";
+        remember = true;
+        rememberBtn.classList.add("active");
+      }
+    }
+  });
 </script>
 
 </body>

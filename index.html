@@ -4,6 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EvoFit - Your Smart Fitness Companion</title>
+  <script>
+    (function() {
+      try {
+        const state = JSON.parse(localStorage.getItem('evoFitApp') || '{}');
+        if (state.theme === 'light') {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      } catch (error) {
+        localStorage.removeItem('evoFitApp');
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -13,9 +25,9 @@
       <a href="index.html" class="logo">EvoFit</a>
       <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
       <ul class="nav-links" id="navLinks">
-        <li><a href="#home">Home</a></li>
-        <li id="dashboardLink" style="display: none;"><a href="dashboard.html">Dashboard</a></li>
-        <li><a href="#tryit">Try It</a></li>
+        <li><a href="index.html#home">Home</a></li>
+        <li id="dashboardLink" style="display: none;"><a href="dashboard.html">Workout</a></li>
+        <li><a href="diet.html">Diet</a></li>
         <li><a href="support.html">About</a></li>
         <li><a href="support.html#contact">Contact</a></li>
         <li><a href="login.html" id="loginLink">Login</a></li>
@@ -84,6 +96,7 @@
     </div>
   </footer>
 
+  <script src="app-storage.js"></script>
   <script src="script.js"></script>
 
 </body>

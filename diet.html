@@ -4,6 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EvoFit - Diet Plan</title>
+  <script>
+    (function() {
+      try {
+        const state = JSON.parse(localStorage.getItem('evoFitApp') || '{}');
+        if (state.theme === 'light') {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      } catch (error) {
+        localStorage.removeItem('evoFitApp');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="diet.css">
 </head>
 <body>
@@ -13,11 +26,26 @@
       <a href="index.html" class="logo">EvoFit</a>
       <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
       <ul class="nav-links" id="navLinks">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="login.html">Login</a></li>
+        <li><a href="index.html#home">Home</a></li>
+        <li id="dashboardLink" style="display: none;"><a href="dashboard.html">Workout</a></li>
+        <li><a href="diet.html">Diet</a></li>
         <li><a href="support.html">About</a></li>
         <li><a href="support.html#contact">Contact</a></li>
+        <li><a href="login.html" id="loginLink">Login</a></li>
         <li><button class="theme-toggle" id="themeToggle">☀️</button></li>
+        <li class="profile-container" id="profileContainer" style="display: none;">
+          <div class="profile-dropdown">
+            <button class="profile-btn" id="profileBtn">👤</button>
+            <div class="profile-menu" id="profileMenu">
+              <div class="profile-header">
+                <span class="profile-username" id="profileUsername">User</span>
+              </div>
+              <hr class="profile-divider">
+              <a href="profile.html" class="profile-link">View Profile</a>
+              <button class="profile-logout" onclick="logoutUser()">Logout</button>
+            </div>
+          </div>
+        </li>
       </ul>
     </div>
   </nav>
@@ -176,6 +204,8 @@
       <p class="copyright">© 2025 EvoFit. All rights reserved.</p>
     </div>
   </footer>
+  <script src="app-storage.js"></script>
+  <script src="script.js"></script>
   <script src="diet.js"></script>
 </body>
 </html>

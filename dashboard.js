@@ -98,6 +98,10 @@ let appState = {
   timerInterval: null
 };
 
+function getActiveUsername() {
+  return window.EvoFitAuth?.getActiveUsername?.() || null;
+}
+
 // ==================== INITIALIZATION ====================
 document.addEventListener('DOMContentLoaded', function() {
   initializeApp();
@@ -115,10 +119,12 @@ function initializeApp() {
     appState.user = userData;
     updateDashboard();
     hideModal();
+    resumeWorkoutFromStorage();
   }
   
   // Setup event listeners
   setupEventListeners();
+  updateLevelUI();
 }
 
 // ==================== EVENT LISTENERS ====================
@@ -134,6 +140,8 @@ function setupEventListeners() {
   // Reset button
   const resetBtn = document.getElementById('resetBtn');
   resetBtn.addEventListener('click', resetApp);
+
+  setupLevelControls();
 }
 
 // ==================== MODAL FUNCTIONS ====================
@@ -154,11 +162,10 @@ function handleUserFormSubmit(e) {
   const userData = {
     weight: parseFloat(formData.get('weight')),
     height: parseInt(formData.get('height')),
-    level: formData.get('level'),
-    timePerDay: parseInt(formData.get('timePerDay'))
+    level: formData.get('level') || 'Beginner'
   };
   
-  // Save to localStorage
+  // Persist user data
   saveUserData(userData);
   appState.user = userData;
   
@@ -175,26 +182,79 @@ function handleUserFormSubmit(e) {
   
   // Update UI
   updateDashboard();
+  updateLevelUI();
   hideModal();
+  resumeWorkoutFromStorage();
+}
+
+// ==================== LEVEL CONTROLS ====================
+function setupLevelControls() {
+  const levelButtons = document.querySelectorAll('.level-btn');
+  levelButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const nextLevel = button.dataset.level;
+      changeUserLevel(nextLevel);
+    });
+  });
+}
+
+function changeUserLevel(level) {
+  if (!appState.user) {
+    showModal();
+    return;
+  }
+
+  if (appState.workoutActive) {
+    alert('Finish or reset your current workout before changing levels.');
+    return;
+  }
+
+  if (appState.user.level === level) {
+    return;
+  }
+
+  appState.user.level = level;
+  saveUserData(appState.user);
+  updateLevelUI();
+
+  updateDashboard();
+}
+
+function updateLevelUI() {
+  const currentLevel = appState.user?.level || 'Beginner';
+  const levelLabel = document.getElementById('currentLevelLabel');
+  if (levelLabel) {
+    levelLabel.textContent = currentLevel;
+  }
+
+  document.querySelectorAll('.level-btn').forEach(button => {
+    button.classList.toggle('active', button.dataset.level === currentLevel);
+  });
 }
 
 // ==================== LOCAL STORAGE FUNCTIONS ====================
 function getUserData() {
-  const data = localStorage.getItem('userInfo');
-  return data ? JSON.parse(data) : null;
+  const username = getActiveUsername();
+  if (!username) return null;
+  return window.EvoFitStorage?.getUserSection?.(username, 'profile') || null;
 }
 
 function saveUserData(data) {
-  localStorage.setItem('userInfo', JSON.stringify(data));
+  const username = getActiveUsername();
+  if (!username) return;
+  window.EvoFitStorage?.setUserSection?.(username, 'profile', data);
 }
 
 function getWorkoutHistory() {
-  const data = localStorage.getItem('workoutHistory');
-  return data ? JSON.parse(data) : null;
+  const username = getActiveUsername();
+  if (!username) return null;
+  return window.EvoFitStorage?.getUserSection?.(username, 'workoutHistory') || null;
 }
 
 function saveWorkoutHistory(data) {
-  localStorage.setItem('workoutHistory', JSON.stringify(data));
+  const username = getActiveUsername();
+  if (!username) return;
+  window.EvoFitStorage?.setUserSection?.(username, 'workoutHistory', data);
 }
 
 // ==================== DASHBOARD FUNCTIONS ====================
@@ -205,7 +265,7 @@ function updateDashboard() {
   document.getElementById('userWeight').textContent = `${appState.user.weight} kg`;
   document.getElementById('userHeight').textContent = `${appState.user.height} cm`;
   document.getElementById('userLevel').textContent = appState.user.level;
-  document.getElementById('userTime').textContent = `${appState.user.timePerDay} min`;
+  updateLevelUI();
   
   // Calculate and display BMI
   const bmi = calculateBMI(appState.user.weight, appState.user.height);
@@ -259,6 +319,128 @@ function updateWorkoutStats() {
     const streak = calculateStreak(history.workoutDays);
     document.getElementById('currentStreak').textContent = `${streak} days`;
   }
+
+  updateMonthlyProgress(history);
+}
+
+function updateMonthlyProgress(history) {
+  const workoutsEl = document.getElementById('monthlyWorkouts');
+  const minutesEl = document.getElementById('monthlyMinutes');
+  const caloriesEl = document.getElementById('monthlyCalories');
+  const consistencyEl = document.getElementById('monthlyConsistency');
+  const progressFill = document.getElementById('monthlyProgressFill');
+  const recentActivity = document.getElementById('recentActivity');
+
+  if (!workoutsEl || !minutesEl || !caloriesEl || !consistencyEl || !progressFill || !recentActivity) {
+    return;
+  }
+
+  if (!history || !Array.isArray(history.workoutSessions) || history.workoutSessions.length === 0) {
+    workoutsEl.textContent = 0;
+    minutesEl.textContent = 0;
+    caloriesEl.textContent = 0;
+    consistencyEl.textContent = '0%';
+    progressFill.style.width = '0%';
+    recentActivity.innerHTML = '<li>No workouts logged yet</li>';
+    return;
+  }
+
+  const THIRTY_DAYS = 30 * 86400000;
+  const now = Date.now();
+  const getSessionTime = session => session.timestamp || new Date(session.date).getTime();
+
+  const recentSessions = history.workoutSessions.filter(session => {
+    const sessionTime = getSessionTime(session);
+    return now - sessionTime <= THIRTY_DAYS;
+  });
+
+  const uniqueDays = new Set(
+    recentSessions.map(session => {
+      const sessionTime = getSessionTime(session);
+      return new Date(sessionTime).toDateString();
+    })
+  );
+
+  const totalMinutes = recentSessions.reduce((sum, session) => sum + (session.duration || 0), 0);
+  const totalCalories = recentSessions.reduce((sum, session) => sum + (session.calories || 0), 0);
+  const totalWorkouts = recentSessions.length;
+  const consistency = Math.min(100, Math.round((uniqueDays.size / 30) * 100));
+
+  workoutsEl.textContent = totalWorkouts;
+  minutesEl.textContent = totalMinutes;
+  caloriesEl.textContent = totalCalories;
+  consistencyEl.textContent = `${consistency}%`;
+  progressFill.style.width = `${consistency}%`;
+
+  const latestSessions = [...recentSessions]
+    .sort((a, b) => getSessionTime(b) - getSessionTime(a))
+    .slice(0, 5);
+
+  if (latestSessions.length === 0) {
+    recentActivity.innerHTML = '<li>Stay active to see your progress here!</li>';
+    return;
+  }
+
+  recentActivity.innerHTML = latestSessions.map(session => {
+    const sessionTime = getSessionTime(session);
+    const label = new Date(sessionTime).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    return `<li><span>${label}</span><span>${session.duration || 0}m · ${session.calories || 0} kcal</span></li>`;
+  }).join('');
+}
+
+// ==================== WORKOUT PERSISTENCE ====================
+function getPersistedWorkoutState() {
+  const username = getActiveUsername();
+  if (!username) return null;
+  return window.EvoFitStorage?.getUserSection?.(username, 'currentWorkout') || null;
+}
+
+function saveCurrentWorkoutState() {
+  if (!appState.workoutActive) return;
+  const username = getActiveUsername();
+  if (!username) return;
+  window.EvoFitStorage?.setUserSection?.(username, 'currentWorkout', {
+    workoutActive: appState.workoutActive,
+    currentWorkout: appState.currentWorkout
+  });
+}
+
+function clearPersistedWorkoutState() {
+  const username = getActiveUsername();
+  if (!username) return;
+  window.EvoFitStorage?.setUserSection?.(username, 'currentWorkout', null);
+}
+
+function resumeWorkoutFromStorage() {
+  if (!appState.user || appState.workoutActive) return;
+  const persisted = getPersistedWorkoutState();
+  if (!persisted || !persisted.workoutActive || !persisted.currentWorkout) return;
+
+  appState.workoutActive = true;
+  appState.currentWorkout = persisted.currentWorkout;
+
+  document.getElementById('workoutControls').style.display = 'none';
+  document.getElementById('workoutPlan').classList.add('active');
+
+  renderExercises();
+  restoreCompletedExercises();
+  updateProgress();
+  startTimer();
+}
+
+function restoreCompletedExercises() {
+  if (!appState.currentWorkout?.completedExercises) return;
+  appState.currentWorkout.completedExercises.forEach(index => {
+    const card = document.getElementById(`exercise-${index}`);
+    if (card) {
+      card.classList.add('completed');
+      const btn = card.querySelector('.btn-complete');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Completed ✓';
+      }
+    }
+  });
 }
 
 function calculateStreak(workoutDays) {
@@ -312,6 +494,7 @@ function startWorkout() {
   
   // Start timer
   startTimer();
+  saveCurrentWorkoutState();
 }
 
 function renderExercises() {
@@ -371,6 +554,7 @@ function completeExercise(index) {
   
   // Update progress
   updateProgress();
+  saveCurrentWorkoutState();
   
   // Check if all exercises completed
   if (appState.currentWorkout.completedExercises.length === exercises.length) {
@@ -388,6 +572,9 @@ function updateProgress() {
 }
 
 function startTimer() {
+  if (appState.timerInterval) {
+    clearInterval(appState.timerInterval);
+  }
   appState.timerInterval = setInterval(() => {
     const elapsed = Date.now() - appState.currentWorkout.startTime;
     const minutes = Math.floor(elapsed / 60000);
@@ -433,12 +620,13 @@ function completeWorkout() {
   history.totalMinutes += duration;
   history.totalCalories += appState.currentWorkout.totalCalories;
   
-  // Save to localStorage
+  // Persist workout history
   saveWorkoutHistory(history);
   
   // Show completion message
   showCompletionMessage(duration, appState.currentWorkout.totalCalories);
   updateWorkoutStats();
+  clearPersistedWorkoutState();
   
   // Reset workout state
   setTimeout(() => {
@@ -459,6 +647,10 @@ function closeCompletionMessage() {
 }
 
 function resetWorkoutUI() {
+  if (appState.timerInterval) {
+    clearInterval(appState.timerInterval);
+    appState.timerInterval = null;
+  }
   appState.workoutActive = false;
   appState.currentWorkout = {
     startTime: null,
@@ -475,14 +667,24 @@ function resetWorkoutUI() {
   document.getElementById('progressText').textContent = '0/12';
   document.getElementById('progressFill').style.width = '0%';
   document.getElementById('workoutTimer').textContent = '00:00';
+
+  clearPersistedWorkoutState();
 }
 
 // ==================== RESET FUNCTIONS ====================
 function resetApp() {
-  if (confirm('Are you sure you want to reset all your data? This action cannot be undone.')) {
-    localStorage.clear();
-    location.reload();
+  if (!confirm('Are you sure you want to reset all your data? This action cannot be undone.')) {
+    return;
   }
+
+  const username = getActiveUsername();
+  if (username) {
+    window.EvoFitStorage?.setUserSection?.(username, 'profile', null);
+    window.EvoFitStorage?.setUserSection?.(username, 'workoutHistory', null);
+    window.EvoFitStorage?.setUserSection?.(username, 'currentWorkout', null);
+  }
+
+  location.reload();
 }
 
 // Make functions globally accessible

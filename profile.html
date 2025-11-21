@@ -4,6 +4,34 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EvoFit - Profile</title>
+  <script>
+    (function() {
+      try {
+        const state = JSON.parse(localStorage.getItem('evoFitApp') || '{}');
+        if (state.theme === 'light') {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      } catch (error) {
+        localStorage.removeItem('evoFitApp');
+      }
+    })();
+    (function() {
+      document.documentElement.dataset.auth = 'pending';
+      const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
+      if (!isLoggedIn) {
+        const target = window.location.pathname.split('/').pop() || 'profile.html';
+        window.location.replace(`login.html?redirect=${encodeURIComponent(target)}`);
+      } else {
+        document.documentElement.dataset.auth = 'granted';
+      }
+    })();
+  </script>
+  <style>
+    html[data-auth="pending"] body {
+      visibility: hidden;
+    }
+  </style>
+  <link rel="stylesheet" href="styles.css">
   <style>
     * {
       margin: 0;
@@ -345,11 +373,26 @@
       <a href="index.html" class="logo">EvoFit</a>
       <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
       <ul class="nav-links" id="navLinks">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="login.html">Login</a></li>
+        <li><a href="index.html#home">Home</a></li>
+        <li id="dashboardLink" style="display: none;"><a href="dashboard.html">Workout</a></li>
+        <li><a href="diet.html">Diet</a></li>
         <li><a href="support.html">About</a></li>
         <li><a href="support.html#contact">Contact</a></li>
+        <li><a href="login.html" id="loginLink">Login</a></li>
         <li><button class="theme-toggle" id="themeToggle">☀️</button></li>
+        <li class="profile-container" id="profileContainer" style="display: none;">
+          <div class="profile-dropdown">
+            <button class="profile-btn" id="profileBtn">👤</button>
+            <div class="profile-menu" id="profileMenu">
+              <div class="profile-header">
+                <span class="profile-username" id="profileUsername">User</span>
+              </div>
+              <hr class="profile-divider">
+              <a href="profile.html" class="profile-link">View Profile</a>
+              <button class="profile-logout" onclick="logoutUser()">Logout</button>
+            </div>
+          </div>
+        </li>
       </ul>
     </div>
   </nav>
@@ -397,84 +440,25 @@
     </div>
   </footer>
 
+  <script src="app-storage.js"></script>
+  <script src="script.js"></script>
   <script>
-    // Load theme immediately to prevent flash
-    (function() {
-      const html = document.documentElement;
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme === 'light') {
-        html.setAttribute('data-theme', 'light');
-      } else {
-        html.removeAttribute('data-theme');
-      }
-    })();
-
-    // Theme toggle functionality
-    const themeToggle = document.getElementById('themeToggle');
-    const html = document.documentElement;
-
-    // Load theme from localStorage
-    function loadTheme() {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme === 'light') {
-        html.setAttribute('data-theme', 'light');
-        if (themeToggle) themeToggle.textContent = '🌙';
-      } else {
-        html.removeAttribute('data-theme');
-        if (themeToggle) themeToggle.textContent = '☀️';
-      }
+    function formatGoalLabel(goal) {
+      if (goal === 'weight-loss') return '📉 Weight Loss';
+      if (goal === 'muscle-gain') return '💪 Muscle Gain';
+      if (goal === 'maintenance') return '⚖️ Maintenance';
+      return 'Balanced';
     }
 
-    // Apply theme on page load
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', loadTheme);
-    } else {
-      loadTheme();
-    }
-
-    if (themeToggle) {
-      themeToggle.addEventListener('click', () => {
-        if (html.getAttribute('data-theme') === 'light') {
-          html.removeAttribute('data-theme');
-          themeToggle.textContent = '☀️';
-          localStorage.setItem('theme', 'dark');
-        } else {
-          html.setAttribute('data-theme', 'light');
-          themeToggle.textContent = '🌙';
-          localStorage.setItem('theme', 'light');
-        }
-      });
-    }
-
-    // Mobile menu toggle
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const navLinks = document.getElementById('navLinks');
-
-    mobileMenuBtn.addEventListener('click', () => {
-      navLinks.classList.toggle('active');
-      mobileMenuBtn.textContent = navLinks.classList.contains('active') ? '✕' : '☰';
-    });
-
-    // Close mobile menu when clicking nav links
-    document.querySelectorAll('.nav-links a').forEach(link => {
-      link.addEventListener('click', () => {
-        if (window.innerWidth <= 768) {
-          navLinks.classList.remove('active');
-          mobileMenuBtn.textContent = '☰';
-        }
-      });
-    });
-
-    // Load and display user profile information
-    function loadProfileInfo() {
-      // Get user info from localStorage
-      const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
-      const activeSession = sessionStorage.getItem('activeSession');
-      const username = activeSession ? JSON.parse(activeSession).username : 'User';
-
+    function renderProfile(username) {
       const profileInfo = document.getElementById('profileInfo');
-      
-      if (userInfo.weight && userInfo.height) {
+      const bmiIndicator = document.getElementById('bmiIndicator');
+      const bmiValue = document.getElementById('bmiValue');
+
+      const profileData =
+        window.EvoFitStorage?.getUserSection?.(username, 'profile');
+
+      if (profileData && profileData.weight && profileData.height) {
         profileInfo.innerHTML = `
           <div class="info-item">
             <div class="info-label">Username</div>
@@ -482,48 +466,36 @@
           </div>
           <div class="info-item">
             <div class="info-label">Weight</div>
-            <div class="info-value">${userInfo.weight} kg</div>
+            <div class="info-value">${profileData.weight} kg</div>
           </div>
           <div class="info-item">
             <div class="info-label">Height</div>
-            <div class="info-value">${userInfo.height} cm</div>
+            <div class="info-value">${profileData.height} cm</div>
           </div>
           <div class="info-item">
             <div class="info-label">Fitness Level</div>
-            <div class="info-value">${userInfo.level || 'Not Set'}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Daily Goal</div>
-            <div class="info-value">${userInfo.timePerDay || 'Not Set'} min</div>
+            <div class="info-value">${profileData.level || 'Not Set'}</div>
           </div>
         `;
 
-        // Calculate and display BMI
-        if (userInfo.weight && userInfo.height) {
-          const heightInMeters = userInfo.height / 100;
-          const bmi = userInfo.weight / (heightInMeters * heightInMeters);
-          const bmiIndicator = document.getElementById('bmiIndicator');
-          const bmiValue = document.getElementById('bmiValue');
-          
-          bmiValue.textContent = bmi.toFixed(2);
-          bmiIndicator.style.display = 'block';
-          
-          // Remove all BMI classes
-          bmiIndicator.classList.remove('bmi-normal', 'bmi-overweight', 'bmi-underweight');
-          
-          // Add appropriate BMI class
-          if (bmi < 18.5) {
-            bmiIndicator.classList.add('bmi-underweight');
-            bmiIndicator.innerHTML = `BMI: ${bmi.toFixed(2)} (Underweight)`;
-          } else if (bmi >= 18.5 && bmi < 25) {
-            bmiIndicator.classList.add('bmi-normal');
-            bmiIndicator.innerHTML = `BMI: ${bmi.toFixed(2)} (Normal)`;
-          } else {
-            bmiIndicator.classList.add('bmi-overweight');
-            bmiIndicator.innerHTML = `BMI: ${bmi.toFixed(2)} (Overweight)`;
-          }
+        const heightInMeters = profileData.height / 100;
+        const bmi = profileData.weight / (heightInMeters * heightInMeters);
+        bmiValue.textContent = bmi.toFixed(2);
+        bmiIndicator.style.display = 'block';
+        bmiIndicator.classList.remove('bmi-normal', 'bmi-overweight', 'bmi-underweight');
+
+        if (bmi < 18.5) {
+          bmiIndicator.classList.add('bmi-underweight');
+          bmiIndicator.textContent = `BMI: ${bmi.toFixed(2)} (Underweight)`;
+        } else if (bmi < 25) {
+          bmiIndicator.classList.add('bmi-normal');
+          bmiIndicator.textContent = `BMI: ${bmi.toFixed(2)} (Normal)`;
+        } else {
+          bmiIndicator.classList.add('bmi-overweight');
+          bmiIndicator.textContent = `BMI: ${bmi.toFixed(2)} (Overweight)`;
         }
       } else {
+        bmiIndicator.style.display = 'none';
         profileInfo.innerHTML = `
           <div class="info-item" style="grid-column: 1 / -1; text-align: center;">
             <div class="info-label">No Profile Data</div>
@@ -533,73 +505,67 @@
           </div>
         `;
       }
+    }
 
-      // Load diet plan info
-      const dietPlan = JSON.parse(localStorage.getItem('dietPlan') || 'null');
+    function renderDietInfo(username) {
       const dietPlanInfo = document.getElementById('dietPlanInfo');
-      
-      if (dietPlan && dietPlan.userData) {
-        const data = dietPlan.userData;
-        let goalText = '';
-        if (data.goal === 'weight-loss') {
-          goalText = '📉 Weight Loss';
-        } else if (data.goal === 'muscle-gain') {
-          goalText = '💪 Muscle Gain';
-        } else {
-          goalText = '⚖️ Maintenance';
-        }
+      const dietData =
+        window.EvoFitStorage?.getUserSection?.(username, 'dietPlan') ||
+        null;
 
-        dietPlanInfo.innerHTML = `
-          <div class="info-grid">
-            <div class="info-item">
-              <div class="info-label">Diet Type</div>
-              <div class="info-value">${data.preference === 'vegetarian' ? '🥬 Vegetarian' : '🍗 Non-Vegetarian'}</div>
-            </div>
-            <div class="info-item">
-              <div class="info-label">Fitness Goal</div>
-              <div class="info-value">${goalText}</div>
-            </div>
-            <div class="info-item">
-              <div class="info-label">Target Calories</div>
-              <div class="info-value">${Math.round(data.targetCalories || 0)} cal/day</div>
-            </div>
-            <div class="info-item">
-              <div class="info-label">Age</div>
-              <div class="info-value">${data.age || 'Not Set'}</div>
-            </div>
-            <div class="info-item">
-              <div class="info-label">Gender</div>
-              <div class="info-value">${data.gender ? data.gender.charAt(0).toUpperCase() + data.gender.slice(1) : 'Not Set'}</div>
-            </div>
-            <div class="info-item">
-              <div class="info-label">Activity Level</div>
-              <div class="info-value">${data.activity ? data.activity.charAt(0).toUpperCase() + data.activity.slice(1) : 'Not Set'}</div>
-            </div>
-          </div>
-          <div style="margin-top: 1.5rem; text-align: center; display: flex; gap: 1rem; justify-content: center;">
-            <a href="diet.html" style="color: var(--accent-color); text-decoration: none; font-weight: 600;">View Full Diet Plan →</a>
-            <span style="color: var(--text-secondary);">|</span>
-            <a href="login.html" style="color: var(--accent-color); text-decoration: none; font-weight: 600;">Edit User Details →</a>
-          </div>
-        `;
-      } else {
+      if (!dietData) {
         dietPlanInfo.innerHTML = `
           <div class="no-diet">
             <p>No diet plan created yet.</p>
             <p><a href="diet.html">Create your diet plan</a></p>
           </div>
         `;
+        return;
       }
+
+      dietPlanInfo.innerHTML = `
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Diet Type</div>
+            <div class="info-value">${dietData.preference === 'vegetarian' ? '🥬 Vegetarian' : '🍗 Non-Vegetarian'}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Fitness Goal</div>
+            <div class="info-value">${formatGoalLabel(dietData.goal)}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Target Calories</div>
+            <div class="info-value">${Math.round(dietData.targetCalories || 0)} cal/day</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Age</div>
+            <div class="info-value">${dietData.age || 'Not Set'}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Gender</div>
+            <div class="info-value">${dietData.gender ? dietData.gender.charAt(0).toUpperCase() + dietData.gender.slice(1) : 'Not Set'}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Activity Level</div>
+            <div class="info-value">${dietData.activity ? dietData.activity.replace('-', ' ') : 'Not Set'}</div>
+          </div>
+        </div>
+        <div style="margin-top: 1.5rem; text-align: center; display: flex; gap: 1rem; justify-content: center;">
+          <a href="diet.html" style="color: var(--accent-color); text-decoration: none; font-weight: 600;">View Full Diet Plan →</a>
+          <span style="color: var(--text-secondary);">|</span>
+          <a href="dashboard.html" style="color: var(--accent-color); text-decoration: none; font-weight: 600;">Update Fitness Data →</a>
+        </div>
+      `;
     }
 
-    // Check if user is logged in
-    window.addEventListener('DOMContentLoaded', () => {
-      if (!sessionStorage.getItem('isLoggedIn')) {
-        alert('Please login first to view your profile!');
-        window.location.href = 'login.html';
-      } else {
-        loadProfileInfo();
+    document.addEventListener('DOMContentLoaded', () => {
+      const username = window.EvoFitAuth?.getActiveUsername?.();
+      if (!username) {
+        window.location.replace('login.html?redirect=profile.html');
+        return;
       }
+      renderProfile(username);
+      renderDietInfo(username);
     });
   </script>
 </body>
