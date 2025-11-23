@@ -31,6 +31,25 @@
       height: 40px;
       width: auto;
     }
+    
+    /* Hide dark theme logo by default (shown in dark theme) */
+    .logo .logo-dark {
+      display: block;
+    }
+    
+    /* Hide light theme logo by default */
+    .logo .logo-light {
+      display: none;
+    }
+    
+    /* In light theme, show light logo and hide dark logo */
+    [data-theme="light"] .logo .logo-dark {
+      display: none;
+    }
+    
+    [data-theme="light"] .logo .logo-light {
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -38,7 +57,8 @@
   <nav class="navbar">
     <div class="nav-container">
       <a href="index.html" class="logo">
-        <img src="logo.jpg" alt="EvoFit Logo">
+        <img src="logo.jpg" alt="EvoFit Logo" class="logo-dark">
+        <img src="logo-light.png" alt="EvoFit Logo" class="logo-light">
         <span>EvoFit</span>
       </a>
       <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
