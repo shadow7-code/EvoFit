@@ -424,6 +424,19 @@
           <!-- Diet plan info will be inserted here -->
         </div>
       </div>
+      <div class="profile-section">
+      <h2>📥 Data Management</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Export or import your fitness data backup</p>
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+        <button id="exportDataBtn" style="flex: 1; min-width: 200px; padding: 1rem; background: var(--accent-color); color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 1rem; transition: all 0.3s ease;">
+        Export Data
+        </button>
+        <button id="importDataBtn" style="flex: 1; min-width: 200px; padding: 1rem; background: var(--accent-hover); color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 1rem; transition: all 0.3s ease;">
+         Import Data
+        </button>
+        <input type="file" id="importFileInput" accept=".json" style="display: none;">
+        </div>
+      </div>
     </div>
   </main>
 
@@ -558,15 +571,99 @@
       `;
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const username = window.EvoFitAuth?.getActiveUsername?.();
-      if (!username) {
-        window.location.replace('login.html?redirect=profile.html');
+    // Add these functions to your profile.html script section
+
+function exportUserData(username) {
+  const state = window.EvoFitStorage?.readState?.();
+  if (!state || !state.users || !state.users[username]) {
+    alert('No user data found to export');
+    return;
+  }
+
+  const userData = {
+    username: username,
+    profile: state.users[username].profile,
+    workoutHistory: state.users[username].workoutHistory,
+    dietPlan: state.users[username].dietPlan,
+    exportDate: new Date().toISOString()
+  };
+
+  const dataStr = JSON.stringify(userData, null, 2);
+  const dataBlob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(dataBlob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `evofit-${username}-${new Date().toISOString().split('T')[0]}.json`;
+  link.click();
+  URL.revokeObjectURL(url);
+  
+  alert('Data exported successfully!');
+}
+
+function importUserData(username, event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const importedData = JSON.parse(e.target.result);
+      
+      // Validate imported data structure
+      if (!importedData.username) {
+        alert('Invalid file format: Missing username');
         return;
       }
-      renderProfile(username);
-      renderDietInfo(username);
-    });
+
+      // Save imported data to localStorage
+      window.EvoFitStorage?.setUserSection?.(username, 'profile', importedData.profile);
+      window.EvoFitStorage?.setUserSection?.(username, 'workoutHistory', importedData.workoutHistory);
+      window.EvoFitStorage?.setUserSection?.(username, 'dietPlan', importedData.dietPlan);
+
+      alert('Data imported successfully! Refreshing page...');
+      
+      // Refresh the page to show updated data
+      setTimeout(() => {
+        location.reload();
+      }, 500);
+
+    } catch (error) {
+      alert('Error importing file: ' + error.message);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = ''; // Reset file input
+}
+
+// Call this in your DOMContentLoaded event
+function initializeExportImport(username) {
+  const exportBtn = document.getElementById('exportDataBtn');
+  const importBtn = document.getElementById('importDataBtn');
+  const importFileInput = document.getElementById('importFileInput');
+
+  if (exportBtn) {
+    exportBtn.addEventListener('click', () => exportUserData(username));
+  }
+
+  if (importBtn) {
+    importBtn.addEventListener('click', () => importFileInput.click());
+  }
+
+  if (importFileInput) {
+    importFileInput.addEventListener('change', (e) => importUserData(username, e));
+  }
+}
+
+  document.addEventListener('DOMContentLoaded', () => {
+  const username = window.EvoFitAuth?.getActiveUsername?.();
+  if (!username) {
+    window.location.replace('login.html?redirect=profile.html');
+    return;
+  }
+  renderProfile(username);
+  renderDietInfo(username);
+  initializeExportImport(username);
+});
   </script>
 </body>
 </html>

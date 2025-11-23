@@ -26,6 +26,9 @@
       --login-input-bg: rgba(0, 0, 0, 0.1);
       --login-input-color: #ffffff;
       --login-placeholder: #999999;
+      --nav-bg: rgba(15, 23, 42, 0.95);
+      --nav-text: #ffffff;
+      --nav-link-hover: #e5e7eb;
     }
 
     [data-theme="light"] {
@@ -35,6 +38,9 @@
       --login-input-bg: rgba(255, 255, 255, 0.9);
       --login-input-color: #1a1a1a;
       --login-placeholder: #666666;
+      --nav-bg: rgba(255, 255, 255, 0.95);
+      --nav-text: #1a1a1a;
+      --nav-link-hover: #0f172a;
     }
 
     /* Navigation Bar */
@@ -79,7 +85,7 @@
     }
 
     .nav-links a {
-      color: var(--text-primary);
+      color: var(--nav-text);
       text-decoration: none;
       font-weight: 500;
       transition: color 0.3s ease;
@@ -89,7 +95,7 @@
 
     .nav-links a:hover {
       color: var(--accent-color);
-      background: var(--bg-secondary);
+      background: var(--nav-link-hover);
     }
 
     .mobile-menu-btn {
@@ -97,7 +103,7 @@
       background: none;
       border: none;
       font-size: 1.5rem;
-      color: var(--text-primary);
+      color: var(--nav-text);
       cursor: pointer;
     }
 
@@ -107,7 +113,7 @@
         top: 70px;
         left: -100%;
         flex-direction: column;
-        background: rgba(15, 23, 42, 0.95);
+        background: var(--nav-bg);
         width: 100%;
         padding: 2rem;
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
