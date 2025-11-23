@@ -17,12 +17,30 @@
     })();
   </script>
   <link rel="stylesheet" href="styles.css">
+  <style>
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 24px;
+    }
+    
+    .logo img {
+      height: 40px;
+      width: auto;
+    }
+  </style>
 </head>
 <body>
   <!-- Navigation Bar -->
   <nav class="navbar">
     <div class="nav-container">
-      <a href="index.html" class="logo">EvoFit</a>
+      <a href="index.html" class="logo">
+        <img src="logo.jpg" alt="EvoFit Logo">
+        <span>EvoFit</span>
+      </a>
       <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
       <ul class="nav-links" id="navLinks">
         <li><a href="index.html#home">Home</a></li>
